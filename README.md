@@ -21,7 +21,7 @@ note連載『どこで切るか』の図の出典となるダッシュボード�
   *(ユーザー承認後に GitHub へプッシュ・公開予定)*
 
 ### 🔗 関連リンク
-* **民放キー局5社 連結財務ダッシュボード**: [https://naohisastry.github.io/broadcaster-financials/](https://naohisastry.github.io/broadcaster-financials/)
+* **フジ・メディアHD 事業別の収益とキャッシュフロー**: [https://naohisastry.github.io/broadcaster-financials-fuji-media-hd/](https://naohisastry.github.io/broadcaster-financials-fuji-media-hd/)
 
 ---
 
