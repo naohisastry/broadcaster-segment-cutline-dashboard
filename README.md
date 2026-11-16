@@ -7,7 +7,9 @@
 
 ![Dashboard Preview](social-preview.png)
 
-テレビ局の利益は、放送からどこへ移っているのか。英ITV（2015〜2025年）と日本の民放キー局5社（2014年3月期〜2026年3月期）について、有価証券報告書と決算資料から、事業セグメント別の売上・利益を並べました。タブ1〜4で、ITVの放送とスタジオの逆転、フジの放送と不動産の2本柱、放送の利益が決算書から読み取れるか、売上に占める放送の比率を比べられます。タブ5に、データと方法をまとめています。金額は原典の百万単位を100で割った億ポンド・億円で、為替の換算はしていません（**Ver 1.56**）。
+テレビ局の利益は、放送からどこへ移っているのか。英ITV（2015〜2025年）と日本の民放キー局5社（2014年3月期〜2026年3月期）について、有価証券報告書と決算資料から、事業セグメント別の売上・利益を並べました。タブ1〜4で、ITVの放送とスタジオの逆転、フジの放送と不動産の2本柱、放送の利益が決算書から読み取れるか、売上に占める放送の比率を比べられます。タブ5に、データと方法をまとめています。金額は原典の百万単位を100で割った億ポンド・億円で、為替の換算はしていません（**Ver 1.58**）。
+
+画面右上の「日本語／English」で英語表示に切り替えられます（英語版の直接リンク：`?lang=en` を付ける。例 `https://naohisastry.github.io/broadcaster-segment-cutline-dashboard/?lang=en#fig-2-1`）。
 
 note連載『どこで切るか』の図の出典となるダッシュボードです。
 
@@ -51,9 +53,11 @@ note連載『どこで切るか』の図の出典となるダッシュボード�
 
 ```
 broadcaster-segment-cutline-dashboard/
-├── broadcaster-segment-cutline-dashboard-v1.56.html  # ダッシュボード本体（Ver 1.56 正本）
-├── index.html                                        # GitHub Pages / サーバー用ルートエイリアス（Ver 1.56同期）
+├── broadcaster-segment-cutline-dashboard-v1.58.html  # ダッシュボード本体（Ver 1.58 正本）
+├── index.html                                        # GitHub Pages / サーバー用ルートエイリアス（Ver 1.58同期）
 ├── data_v1.1.js                                      # 構造化データセット（最新版データ）
+├── i18n_core_v1.0.js                                 # 日英切り替えの仕組み（英語表示のときだけ置き換え）
+├── i18n_en_v1.1.js                                   # 英語の辞書と換算規則（¥bn・£m・FY表記）
 ├── social-preview.png                                # OGP標準画像（1200×630px）
 ├── README.md                                         # 本文書
 ├── DATA_SOURCES.md                                   # データソース・原典一覧
@@ -63,6 +67,32 @@ broadcaster-segment-cutline-dashboard/
 ├── LICENSE-CONTENT.md                                # CC BY 4.0ライセンス（文章・データ・図表）
 └── .gitignore                                        # Git除外設定
 ```
+
+---
+
+## 🇬🇧 English
+
+**How TV Broadcasters Make Money: Segment Results of ITV and Japan's Five Key Commercial Broadcasters**
+
+Where are TV broadcasters' profits moving, away from broadcasting? This dashboard lines up revenue and profit by business segment for the UK's ITV (FY12/2015–FY12/2025) and Japan's five key commercial broadcasters (FY3/2014–FY3/2026) — Fuji Media HD, Nippon TV HD, TBS HD, TV Asahi HD and TV Tokyo HD — taken from annual securities reports and results materials.
+
+- **Live (English):** https://naohisastry.github.io/broadcaster-segment-cutline-dashboard/?lang=en
+- Switch language with **日本語 / English** at the top right. The choice is remembered on your device; `?lang=en` or `?lang=ja` in the URL always takes priority. Section links (e.g. `#fig-2-1`) work in both languages.
+
+| Tab | What it shows |
+|---|---|
+| 1. ITV: Broadcasting vs Studios | Adjusted EBITA by division, Studios intra-group vs external revenue, advertising revenue (NAR→TAR break), terms of the 2026 sale of M&E to Sky, 15 division definition changes |
+| 2. Fuji HD: Two Pillars | Segment profit of Media & Content and Urban Development, Hotels & Resorts; timeline to the 2026 review of outside capital |
+| 3. How Visible Is Broadcast Profit? | Broadcasting's share of segment profit, and where it stops being disclosed |
+| 4. Broadcasting's Share of Revenue | Slope chart FY3/2015 → FY3/2026, and profit vs revenue disclosure |
+| 5. Data & Methods | All CSVs, definitions and treatment of discontinuities |
+
+**Conventions in the English version**
+
+- Amounts stay in each company's reporting currency, with no FX conversion: **£m** for ITV, **¥bn** for Japanese broadcasters. Tables and CSVs keep the original units (£m, ¥m).
+- Japanese fiscal years are shown as **FY3/2026** (year ending March 2026); ITV as **FY12/2025**.
+- Segment names follow each company's official English disclosures.
+- Translations of Japanese quotes are the author's.
 
 ---
 

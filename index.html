@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益 Ver 1.56</title>
+  <title>テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益 Ver 1.58</title>
   <meta name="description" content="英ITVと日本の民放キー局5社の事業セグメント別の売上・利益を、有価証券報告書と決算資料から並べたダッシュボード。放送からどこへ利益が移っているかを比べられます。">
   <meta name="author" content="Naohisa Hashimoto (Media Architect)">
   
   <link rel="canonical" href="https://naohisastry.github.io/broadcaster-segment-cutline-dashboard/">
   <!-- OGP Settings (AGENTS.md 3.5準拠) -->
   <meta property="og:site_name" content="Naohisa Hashimoto Media Architecture Research">
-  <meta property="og:title" content="テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益 Ver 1.56">
+  <meta property="og:title" content="テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益 Ver 1.58">
   <meta property="og:description" content="英ITVと日本の民放キー局5社の事業セグメント別の売上・利益を、有価証券報告書と決算資料から並べたダッシュボード。放送からどこへ利益が移っているかを比べられます。">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ja_JP">
@@ -21,7 +21,7 @@
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益 Ver 1.56">
+  <meta name="twitter:title" content="テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益 Ver 1.58">
   <meta name="twitter:description" content="英ITVと日本の民放キー局5社の事業セグメント別の売上・利益を、有価証券報告書と決算資料から並べたダッシュボード。放送からどこへ利益が移っているかを比べられます。">
   <meta name="twitter:image" content="https://naohisastry.github.io/broadcaster-segment-cutline-dashboard/social-preview.png">
 
@@ -719,7 +719,15 @@
     }
     .footer-title { font-size: 13px; color: var(--fg2); }
     .footer-sub { font-size: 11.5px; color: var(--muted); }
+  
+    /* 言語切り替え（v1.57） */
+    .lang-switch { display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+    .lang-switch button { background:transparent; color:var(--muted); border:0; padding:4px 10px; font-size:11.5px; cursor:pointer; font-family:inherit; }
+    .lang-switch button + button { border-left:1px solid var(--line); }
+    .lang-switch button.active { background:rgba(96,165,250,0.18); color:#eef1f5; font-weight:700; cursor:default; }
   </style>
+  <script src="i18n_core_v1.0.js"></script>
+  <script src="i18n_en_v1.1.js"></script>
 </head>
 <body>
 
@@ -733,7 +741,7 @@
           <p class="header-lead">テレビ局の利益は、放送からどこへ移っているのか。英ITV（2015〜2025年）と日本の民放キー局5社（2014年3月期〜2026年3月期）について、有価証券報告書と決算資料から、事業セグメント別の売上・利益を並べました。タブ1〜4で、ITVの放送とスタジオの逆転、フジの放送と不動産の2本柱、放送の利益が決算書から読み取れるか、売上に占める放送の比率を比べられます。タブ5に、データと方法をまとめています。金額は原典の百万単位を100で割った億ポンド・億円で、為替の換算はしていません。</p>
         </div>
         <div class="header-meta">
-          <span class="version-badge">Ver 1.56</span>
+          <span class="version-badge">Ver 1.58</span>
           <span class="date-badge">2026.11</span>
         </div>
       </div>
@@ -1038,9 +1046,9 @@
               <thead>
                 <tr>
                   <th>年度</th>
-                  <th>メディア・コンテンツ利益 [億円]</th>
-                  <th>都市開発・観光利益 [億円]</th>
-                  <th>合計利益 [億円]</th>
+                  <th>メディア・コンテンツ利益 [百万円]</th>
+                  <th>都市開発・観光利益 [百万円]</th>
+                  <th>合計利益 [百万円]</th>
                   <th>都市開発比率 (%)</th>
                   <th>開示基準</th>
                 </tr>
@@ -1458,6 +1466,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const DATA = window.DATA_V1;
+      const EN = window.__LANG === "en"; // v1.57: 英語表示では軸目盛りを£m・¥bnにする（v1.58: 日本語のツールチップ・表見出しの単位を百万単位に訂正）
       let currentCompanyFilter = "all";
 
       if (!DATA) {
@@ -1698,7 +1707,7 @@
 
         for (let v = 0; v <= maxY; v += 100) {
           const yPos = getY(v);
-          const labelVal = v === 0 ? "0" : (v / 100).toFixed(0);
+          const labelVal = v === 0 ? "0" : (EN ? String(v) : (v / 100).toFixed(0));
           svg += `<line x1="${pad.left}" y1="${yPos}" x2="${w - pad.right}" y2="${yPos}" stroke="#1d2433" stroke-width="1"/>
             <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="10" text-anchor="end">${labelVal}</text>`;
         }
@@ -1767,7 +1776,7 @@
         const crossX = getX(2023);
         const crossYStudios = getY(286);
         const crossYBroadcast = getY(205);
-        const boxW = 138, boxH = 34;
+        const boxW = EN ? 196 : 138, boxH = 34;
         const boxX = 562; // 2022年(559)の右、2023年(631)をまたぐ位置
         const boxY = 115; // 目盛り4〜5の間(Y=108.6〜146.8)
 
@@ -1800,9 +1809,9 @@
             <circle cx="8" cy="0" r="3" fill="#60a5fa"/>
             <text x="22" y="4" fill="#eef1f5" font-size="10.5">放送 (Broadcast & Online → M&E)</text>
 
-            <line x1="225" y1="0" x2="241" y2="0" stroke="#ffb35c" stroke-width="2.5"/>
-            <circle cx="233" cy="0" r="3.5" fill="#ffb35c"/>
-            <text x="247" y="4" fill="#eef1f5" font-size="10.5">ITV Studios</text>
+            <line x1="${EN ? 272 : 225}" y1="0" x2="${EN ? 288 : 241}" y2="0" stroke="#ffb35c" stroke-width="2.5"/>
+            <circle cx="${EN ? 280 : 233}" cy="0" r="3.5" fill="#ffb35c"/>
+            <text x="${EN ? 294 : 247}" y="4" fill="#eef1f5" font-size="10.5">ITV Studios</text>
           </g>
         `;
 
@@ -1843,7 +1852,7 @@
 
         for (let v = 0; v <= maxY; v += 500) {
           const yPos = getY(v);
-          const labelVal = v === 0 ? "0" : (v / 100).toFixed(0);
+          const labelVal = v === 0 ? "0" : (EN ? String(v) : (v / 100).toFixed(0));
           svg += `<line x1="${pad.left}" y1="${yPos}" x2="${w - pad.right}" y2="${yPos}" stroke="#1d2433" stroke-width="1"/>
             <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="10" text-anchor="end">${labelVal}</text>`;
         }
@@ -1879,8 +1888,8 @@
           <g transform="translate(${pad.left + 20}, ${pad.top - 10})">
             <rect x="0" y="0" width="12" height="12" fill="#ffb35c" rx="2"/>
             <text x="18" y="10" fill="#eef1f5" font-size="11">グループ内売上 (棒上部は社内比率)</text>
-            <rect x="220" y="0" width="12" height="12" fill="#3b82f6" rx="2"/>
-            <text x="238" y="10" fill="#eef1f5" font-size="11">外部顧客売上（外販）</text>
+            <rect x="${EN ? 345 : 220}" y="0" width="12" height="12" fill="#3b82f6" rx="2"/>
+            <text x="${EN ? 363 : 238}" y="10" fill="#eef1f5" font-size="11">外部顧客売上（外販）</text>
           </g>
         `;
 
@@ -1928,7 +1937,7 @@
 
         for (let v = 0; v <= maxY; v += 500) {
           const yPos = getY(v);
-          const labelVal = v === 0 ? "0" : (v / 100).toFixed(0);
+          const labelVal = v === 0 ? "0" : (EN ? String(v) : (v / 100).toFixed(0));
           svg += `<line x1="${pad.left}" y1="${yPos}" x2="${w - pad.right}" y2="${yPos}" stroke="#1d2433" stroke-width="1"/>
             <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="10" text-anchor="end">${labelVal}</text>`;
         }
@@ -1988,13 +1997,13 @@
             <circle cx="10" cy="0" r="3" fill="#9cc2f0"/>
             <text x="26" y="4" fill="#eef1f5" font-size="11">放送部門売上</text>
 
-            <line x1="140" y1="0" x2="160" y2="0" stroke="#ffb35c" stroke-width="2.5"/>
-            <circle cx="150" cy="0" r="3" fill="#ffb35c"/>
-            <text x="166" y="4" fill="#eef1f5" font-size="11">2015-17: NAR (純広告)</text>
+            <line x1="${EN ? 245 : 140}" y1="0" x2="${EN ? 265 : 160}" y2="0" stroke="#ffb35c" stroke-width="2.5"/>
+            <circle cx="${EN ? 255 : 150}" cy="0" r="3" fill="#ffb35c"/>
+            <text x="${EN ? 271 : 166}" y="4" fill="#eef1f5" font-size="11">2015-17: NAR (純広告)</text>
 
-            <line x1="310" y1="0" x2="330" y2="0" stroke="#ffb35c" stroke-width="2.5" stroke-dasharray="4,2"/>
-            <circle cx="320" cy="0" r="3.5" fill="#ffb35c"/>
-            <text x="336" y="4" fill="#eef1f5" font-size="11">2018-25: TAR (総広告)</text>
+            <line x1="${EN ? 495 : 310}" y1="0" x2="${EN ? 515 : 330}" y2="0" stroke="#ffb35c" stroke-width="2.5" stroke-dasharray="4,2"/>
+            <circle cx="${EN ? 505 : 320}" cy="0" r="3.5" fill="#ffb35c"/>
+            <text x="${EN ? 521 : 336}" y="4" fill="#eef1f5" font-size="11">2018-25: TAR (総広告)</text>
           </g>
         `;
 
@@ -2198,7 +2207,7 @@
           if (v === 0) continue;
           const yPos = getY(v);
           svg += `<line x1="${pad.left}" y1="${yPos}" x2="${w - pad.right}" y2="${yPos}" stroke="#1d2433" stroke-width="1"/>
-            <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="9.5" text-anchor="end">${v}</text>`;
+            <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="9.5" text-anchor="end">${EN ? v / 10 : v}</text>`;
         }
 
         // 0基準線の強調（はっきり見える破線）
@@ -2393,7 +2402,7 @@
           svg += `<polyline points="${polylinePts}" fill="none" stroke="${st.color}" stroke-width="${strokeW}" stroke-dasharray="${dash}"/>`;
 
           pts.forEach(p => {
-            const unit = isITV ? "百万ポンド" : "億円";
+            const unit = isITV ? "百万ポンド" : "百万円";
             svg += `<circle class="chart-point" cx="${p.x}" cy="${p.y}" r="${isITV ? 3.5 : 4.5}" fill="${st.color}" stroke="#111726" stroke-width="1.5"
               data-tt-title="${comp}（${p.raw.period}）"
               data-tt-label="${comp} ${s.series_type}区分"
@@ -2428,10 +2437,10 @@
           <g transform="translate(${pad.left}, ${pad.top - 20})">
             <line x1="0" y1="0" x2="16" y2="0" stroke="#fff" stroke-width="2"/>
             <text x="22" y="4" fill="#eef1f5" font-size="11">実線＝旧区分</text>
-            <line x1="110" y1="0" x2="126" y2="0" stroke="#fff" stroke-width="2" stroke-dasharray="4,3"/>
-            <text x="132" y="4" fill="#eef1f5" font-size="11">破線＝新区分</text>
-            <circle cx="230" cy="0" r="4" fill="#FFC000"/>
-            <text x="240" y="4" fill="#FFC000" font-size="11">日テレ：放送単独の利益は一度も開示されていない（線なし）</text>
+            <line x1="${EN ? 190 : 110}" y1="0" x2="${EN ? 206 : 126}" y2="0" stroke="#fff" stroke-width="2" stroke-dasharray="4,3"/>
+            <text x="${EN ? 212 : 132}" y="4" fill="#eef1f5" font-size="11">破線＝新区分</text>
+            <circle cx="${EN ? 375 : 230}" cy="0" r="4" fill="#FFC000"/>
+            <text x="${EN ? 385 : 240}" y="4" fill="#FFC000" font-size="11">日テレ：放送単独の利益は一度も開示されていない（線なし）</text>
           </g>
         `;
 
@@ -2468,7 +2477,7 @@
         tbody.innerHTML = tableRowsHtml;
 
         const w = 840, h = 180;
-        const pad = { top: 30, right: 100, bottom: 25, left: 275 };
+        const pad = { top: 30, right: 100, bottom: 25, left: EN ? 420 : 275 };
         const plotW = w - pad.left - pad.right;
 
         let svg = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="background:#111726; border-radius:6px; font-family:var(--f-body);">`;
@@ -2486,7 +2495,7 @@
             data-tt-label="${formatStructure(item.structure)}"
             data-tt-val="${item.share_pct.toFixed(1)}%"
             data-tt-color="${color}"
-            data-tt-note="放送利益: ${item.broadcast_profit.toFixed(1)}億円 / セグメント合計: ${item.total_profit.toFixed(1)}億円"/>`;
+            data-tt-note="放送利益: ${item.broadcast_profit.toFixed(1)}百万円 / セグメント合計: ${item.total_profit.toFixed(1)}百万円"/>`;
 
           svg += `<text class="chart-annotation" x="${pad.left - 12}" y="${y + 20}" fill="#eef1f5" font-size="12" text-anchor="end">${formatStructure(item.structure)}</text>`;
           svg += `<text class="chart-annotation" x="${pad.left + barW + 10}" y="${y + 21}" fill="${color}" font-size="14" font-weight="bold" font-family="var(--f-mono)">${item.share_pct}%</text>`;
@@ -2563,7 +2572,7 @@
           if (comp.includes("ITV")) offsetLeftY = -6;
           if (comp.includes("TBS")) offsetLeftY = 9;
 
-          const compUnit = comp.includes("ITV") ? "億ポンド" : "億円";
+          const compUnit = comp.includes("ITV") ? "百万ポンド" : "百万円";
           const diffPt = (p.end.broadcast_share_pct - p.start.broadcast_share_pct).toFixed(1);
           svg += `
             <line x1="${leftX}" y1="${y1}" x2="${rightX}" y2="${y2}" stroke="${color}" stroke-width="${strokeW}" ${isFuji ? 'filter="drop-shadow(0 0 4px #FF0000)"' : ''}/>
@@ -2572,7 +2581,7 @@
               data-tt-label="売上に占める放送の比率"
               data-tt-val="${p.start.broadcast_share_pct.toFixed(1)}%"
               data-tt-color="${color}"
-              data-tt-note="放送売上: ${p.start.broadcast_rev.toFixed(1)} / 全社売上: ${(p.start.broadcast_rev + p.start.content_ip_rev + p.start.non_broadcast_rev).toFixed(1)} (${compUnit})"/>
+              data-tt-note="放送売上: ${p.start.broadcast_rev.toFixed(1)}${comp.includes("ITV") ? "" : ` / 全社売上: ${(p.start.broadcast_rev + p.start.content_ip_rev + p.start.non_broadcast_rev).toFixed(1)}`} (${compUnit})"/>
             <circle class="chart-point" cx="${rightX}" cy="${y2}" r="${isFuji ? 5.5 : 4}" fill="${color}" stroke="#111726" stroke-width="1.5"
               data-tt-title="${comp}（${p.end.period}）"
               data-tt-label="売上に占める放送の比率"
@@ -2615,6 +2624,13 @@
         tbody.innerHTML = html;
       }
 
+    });
+  </script>
+  <script>
+    // v1.57: 言語切り替えボタンの設置と英語化（アプリの描画後に実行）
+    document.addEventListener("DOMContentLoaded", function() {
+      window.I18N_MOUNT_SWITCH(document.querySelector(".header-meta"));
+      window.I18N_RUN();
     });
   </script>
 </body>

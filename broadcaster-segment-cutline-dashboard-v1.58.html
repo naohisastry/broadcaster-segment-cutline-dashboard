@@ -1,0 +1,2637 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益 Ver 1.58</title>
+  <meta name="description" content="英ITVと日本の民放キー局5社の事業セグメント別の売上・利益を、有価証券報告書と決算資料から並べたダッシュボード。放送からどこへ利益が移っているかを比べられます。">
+  <meta name="author" content="Naohisa Hashimoto (Media Architect)">
+  
+  <link rel="canonical" href="https://naohisastry.github.io/broadcaster-segment-cutline-dashboard/">
+  <!-- OGP Settings (AGENTS.md 3.5準拠) -->
+  <meta property="og:site_name" content="Naohisa Hashimoto Media Architecture Research">
+  <meta property="og:title" content="テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益 Ver 1.58">
+  <meta property="og:description" content="英ITVと日本の民放キー局5社の事業セグメント別の売上・利益を、有価証券報告書と決算資料から並べたダッシュボード。放送からどこへ利益が移っているかを比べられます。">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:url" content="https://naohisastry.github.io/broadcaster-segment-cutline-dashboard/">
+  <meta property="og:image" content="https://naohisastry.github.io/broadcaster-segment-cutline-dashboard/social-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益 Ver 1.58">
+  <meta name="twitter:description" content="英ITVと日本の民放キー局5社の事業セグメント別の売上・利益を、有価証券報告書と決算資料から並べたダッシュボード。放送からどこへ利益が移っているかを比べられます。">
+  <meta name="twitter:image" content="https://naohisastry.github.io/broadcaster-segment-cutline-dashboard/social-preview.png">
+
+  <!-- スタイル定義 -->
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --panel: #111726;
+      --card-bg: #141c2e;
+      --fg: #eef1f5;
+      --fg2: #b8c0cc;
+      --muted: #8a93a1;
+      --line: #273041;
+      --grid: #1d2433;
+      --accent: #9cc2f0;
+      --warn: #ffb35c;
+      --warn-bg: rgba(255, 179, 92, 0.12);
+
+      /* 民放キー局 基本カラー規定 (2026-10-23 策定) */
+      --color-ntv: #FFC000; /* 日本テレビ (Gold/Amber Yellow) */
+      --color-ex:  #FF66FF; /* テレビ朝日 (Magenta/Bright Pink) */
+      --color-tbs: #002060; /* TBS (Deep Navy - 原色) */
+      --color-tbs-darkmode: #4b82f6; /* TBS (ダーク背景用視認性調整ブルー) */
+      --color-tx:  #00B0F0; /* テレビ東京 (Cyan/Sky Blue) */
+      --color-cx:  #FF0000; /* フジテレビ (Pure Red) */
+      --color-itv: #8a93a1; /* ITV (UK参考 - Gray) */
+
+      --f-display: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", -apple-system, BlinkMacSystemFont, sans-serif;
+      --f-body: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      --f-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--f-body);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* App Header */
+    .app-header {
+      background: rgba(10, 14, 26, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 16px 8px;
+    }
+    .header-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .header-title-area h1 {
+      font-family: var(--f-display);
+      font-size: clamp(18px, 2.5vw, 24px);
+      font-weight: 700;
+      margin: 0;
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+    .header-lead {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: var(--fg2);
+      margin: 6px 0 0;
+      max-width: 980px;
+    }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--f-mono);
+      font-size: 11px;
+    }
+    .version-badge {
+      background: var(--line);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      border: 1px solid rgba(156, 194, 240, 0.3);
+    }
+    .date-badge { color: var(--muted); }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+    .nav-tabs::-webkit-scrollbar { height: 4px; }
+    .nav-tabs::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+    .nav-tab-btn {
+      font-family: var(--f-display);
+      font-size: 12.5px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--muted);
+      padding: 6px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .nav-tab-btn:hover {
+      color: var(--fg);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .nav-tab-btn[aria-selected="true"] {
+      color: #fff;
+      background: rgba(156, 194, 240, 0.15);
+      border-color: var(--accent);
+    }
+    .tab-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .nav-tab-btn[aria-selected="true"] .tab-dot {
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+    }
+
+    /* Main Container */
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .tab-pane.active {
+      display: flex;
+    }
+
+    /* Tab Intro Header */
+    .tab-header {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+    }
+    .tab-header h2 {
+      font-family: var(--f-display);
+      font-size: 20px;
+      margin: 0 0 4px;
+      color: #fff;
+    }
+    .tab-header p {
+      font-size: 13px;
+      color: var(--fg2);
+      margin: 0;
+    }
+
+    /* Figure Card */
+    .fig-card {
+      background: var(--card-bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-margin-top: 110px;
+    }
+    .fig-card-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 8px;
+    }
+    .fig-badge {
+      font-family: var(--f-mono);
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(156, 194, 240, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(156, 194, 240, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .fig-title {
+      font-family: var(--f-display);
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fig-anchor-link {
+      font-size: 12px;
+      color: var(--muted);
+      opacity: 0.5;
+      text-decoration: none;
+    }
+    .fig-anchor-link:hover { opacity: 1; }
+
+    /* Focus Alert */
+    .fig-focus {
+      background: rgba(255, 179, 92, 0.08);
+      border-left: 3px solid var(--warn);
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--fg);
+    }
+    .fig-focus strong {
+      color: var(--warn);
+      margin-right: 6px;
+    }
+
+    /* Chart Container & SVG */
+    .chart-container {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .chart-container svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-width: 500px;
+    }
+    @media (max-width: 600px) {
+      .chart-container svg { min-width: 440px; }
+    }
+
+    /* Details Table & CSV Button */
+    .data-table-details {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .data-table-details summary {
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--fg2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .data-table-details summary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+    .csv-dl-btn {
+      font-family: var(--f-mono);
+      font-size: 11px;
+      background: rgba(156, 194, 240, 0.1);
+      border: 1px solid rgba(156, 194, 240, 0.3);
+      color: var(--accent);
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .csv-dl-btn:hover {
+      background: var(--accent);
+      color: var(--panel);
+    }
+    .table-wrapper {
+      max-height: 320px;
+      overflow: auto;
+      border-top: 1px solid var(--line);
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    table.data-table th, table.data-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    table.data-table th {
+      background: #0f1523;
+      color: var(--muted);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    table.data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .num { font-variant-numeric: tabular-nums; text-align: right; }
+
+    /* Table Fig 1-5 (Segment Definition Log) */
+    #table-fig-1-5-full {
+      min-width: 1200px;
+      table-layout: fixed;
+    }
+    #table-fig-1-5-full th.col-year { width: 65px; text-align: center; }
+    #table-fig-1-5-full th.col-old-seg { width: 140px; }
+    #table-fig-1-5-full th.col-new-seg { width: 140px; }
+    #table-fig-1-5-full th.col-what { width: 220px; }
+    #table-fig-1-5-full th.col-restated { width: 85px; text-align: center; }
+    #table-fig-1-5-full th.col-continuity { width: 210px; }
+    #table-fig-1-5-full th.col-quote { width: 340px; }
+
+    .quote-scroll-box {
+      max-width: 330px;
+      overflow-x: auto;
+      white-space: nowrap;
+      font-family: var(--f-mono);
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--fg2);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 5px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .quote-scroll-box::-webkit-scrollbar {
+      height: 4px;
+    }
+    .quote-scroll-box::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .quote-scroll-box::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+    }
+    .quote-scroll-box::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Interactive Chart Tooltip */
+    .chart-tooltip {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.12s ease;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 11.5px;
+      color: #e2e8f0;
+      z-index: 9999;
+      transform: translate(-50%, -100%);
+      margin-top: -10px;
+      white-space: nowrap;
+      backdrop-filter: blur(6px);
+      font-family: var(--f-sans);
+    }
+    .chart-tooltip.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    .chart-tooltip .tt-title {
+      font-weight: 700;
+      font-size: 12px;
+      color: #fff;
+      margin-bottom: 5px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .chart-tooltip .tt-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 3px 0;
+    }
+    .chart-tooltip .tt-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .chart-tooltip .tt-label {
+      color: #94a3b8;
+    }
+    .chart-tooltip .tt-val {
+      font-weight: 700;
+      font-family: var(--f-mono);
+      color: #f8fafc;
+      margin-left: auto;
+      padding-left: 10px;
+    }
+    .chart-tooltip .tt-note {
+      font-size: 10px;
+      color: #ffb35c;
+      margin-top: 4px;
+    }
+    .chart-point {
+      cursor: pointer;
+      transition: r 0.15s ease, stroke-width 0.15s ease, filter 0.15s ease;
+    }
+    .chart-point:hover {
+      r: 6.5px !important;
+      stroke: #ffffff !important;
+      stroke-width: 2.5px !important;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+    }
+    .chart-bar {
+      cursor: pointer;
+      transition: filter 0.15s ease, opacity 0.15s ease;
+    }
+    .chart-bar:hover {
+      filter: brightness(1.25) drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
+      opacity: 0.9;
+    }
+    .chart-annotation {
+      pointer-events: none;
+    }
+
+    /* Source & Notes */
+    .fig-source-note {
+      font-size: 11.5px;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 8px;
+    }
+    .fig-source-note strong { color: var(--fg2); }
+
+    /* Interactive Controls */
+    .chart-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--fg2);
+      border-radius: 4px;
+      padding: 3px 10px;
+      cursor: pointer;
+      font-size: 11.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .filter-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #fff;
+      color: #fff;
+      font-weight: 700;
+    }
+    .color-swatch {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+
+    /* Deal Terms グループ化レイアウト (Ver 1.4) */
+    .deal-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .deal-group {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .deal-group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 6px;
+    }
+    .deal-group-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .deal-group-subtitle {
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .deal-breakdown-bar {
+      display: flex;
+      width: 100%;
+      height: 12px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #0f1523;
+      margin-top: 4px;
+    }
+    .deal-bar-seg {
+      height: 100%;
+    }
+    .deal-cards-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .deal-card-compact {
+      background: #141c2e;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .deal-card-compact.primary {
+      border-color: rgba(255, 179, 92, 0.4);
+      background: rgba(255, 179, 92, 0.04);
+    }
+    .deal-card-compact .val {
+      font-family: var(--f-mono);
+      font-size: 19px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .deal-card-compact .lbl {
+      font-size: 11.5px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .deal-card-compact .sub {
+      font-size: 11px;
+      color: var(--fg2);
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    /* Cards Grid (Deal terms) */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .metric-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .metric-card.guidance {
+      border-color: rgba(255, 179, 92, 0.4);
+      background: rgba(255, 179, 92, 0.03);
+    }
+    .metric-title {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .guidance-tag {
+      font-size: 10px;
+      color: var(--warn);
+      background: var(--warn-bg);
+      border: 1px solid rgba(255, 179, 92, 0.3);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+    .metric-val {
+      font-family: var(--f-mono);
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .metric-unit { font-size: 12px; color: var(--muted); margin-left: 4px; font-weight: normal; }
+    .metric-note { font-size: 11px; color: var(--fg2); margin-top: 2px; }
+
+    /* Timeline Container */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-left: 2px solid var(--line);
+      margin-left: 8px;
+      padding-left: 18px;
+    }
+    .timeline-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -23px;
+      top: 5px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-cx);
+      border: 2px solid var(--card-bg);
+    }
+    .timeline-item.warn::before {
+      background: var(--warn);
+      box-shadow: 0 0 6px var(--warn);
+    }
+    .timeline-date {
+      font-family: var(--f-mono);
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .timeline-item.warn .timeline-date { color: var(--warn); }
+    .timeline-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .timeline-desc {
+      font-size: 12.5px;
+      color: var(--fg2);
+      background: var(--panel);
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+    }
+
+    /* Footer */
+    .app-footer {
+      border-top: 1px solid var(--line);
+      background: rgba(6, 9, 19, 0.95);
+      padding: 24px 16px;
+      margin-top: 40px;
+    }
+    .footer-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+    }
+    .footer-title { font-size: 13px; color: var(--fg2); }
+    .footer-sub { font-size: 11.5px; color: var(--muted); }
+  
+    /* 言語切り替え（v1.57） */
+    .lang-switch { display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+    .lang-switch button { background:transparent; color:var(--muted); border:0; padding:4px 10px; font-size:11.5px; cursor:pointer; font-family:inherit; }
+    .lang-switch button + button { border-left:1px solid var(--line); }
+    .lang-switch button.active { background:rgba(96,165,250,0.18); color:#eef1f5; font-weight:700; cursor:default; }
+  </style>
+  <script src="i18n_core_v1.0.js"></script>
+  <script src="i18n_en_v1.1.js"></script>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="header-top">
+        <div class="header-title-area">
+          <h1>テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益</h1>
+          <!-- 英ITVの放送／スタジオ分離（SkyへのM&E売却合意）と、日本の民放キー局のセグメント区分推移（基本カラー規定準拠） -->
+          <p class="header-lead">テレビ局の利益は、放送からどこへ移っているのか。英ITV（2015〜2025年）と日本の民放キー局5社（2014年3月期〜2026年3月期）について、有価証券報告書と決算資料から、事業セグメント別の売上・利益を並べました。タブ1〜4で、ITVの放送とスタジオの逆転、フジの放送と不動産の2本柱、放送の利益が決算書から読み取れるか、売上に占める放送の比率を比べられます。タブ5に、データと方法をまとめています。金額は原典の百万単位を100で割った億ポンド・億円で、為替の換算はしていません。</p>
+        </div>
+        <div class="header-meta">
+          <span class="version-badge">Ver 1.58</span>
+          <span class="date-badge">2026.11</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs (5タブ構成) -->
+      <nav class="nav-tabs" role="tablist">
+        <button class="nav-tab-btn" data-tab="tab-1" aria-selected="true" role="tab">
+          <span class="tab-dot"></span>1. ITV：放送とスタジオ
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-2" aria-selected="false" role="tab">
+          <span class="tab-dot"></span>2. フジHD：２本柱
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-3" aria-selected="false" role="tab">
+          <span class="tab-dot"></span>3. 放送利益の可視性
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-4" aria-selected="false" role="tab">
+          <span class="tab-dot"></span>4. 売上で見た立ち位置
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-5" aria-selected="false" role="tab">
+          <span class="tab-dot"></span>5. データと方法
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Wrap -->
+  <main class="wrap">
+
+    <!-- ==========================================
+         タブ1: ITV：放送とスタジオ
+         ========================================== -->
+    <div id="tab-1" class="tab-pane active" role="tabpanel">
+      <div class="tab-header">
+        <h2>1. ITV：放送とスタジオ</h2>
+        <p>英ITVにおける放送部門（Media & Entertainment）の収益低下と、ITV Studiosの成長・逆転、そして2026年のSkyへの売却条件を検証。</p>
+      </div>
+
+      <!-- 図1-1 -->
+      <section class="fig-card" id="fig-1-1">
+        <div class="fig-card-header">
+          <span class="fig-badge">図1-1</span>
+          <h2 class="fig-title">
+            部門別の調整後EBITA（2015〜2025年）
+            <a href="#fig-1-1" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          放送部門（Broadcast & Online → M&E）の利益が長期減少傾向をたどる一方、ITV Studiosが成長を続け、2023年に利益水準が逆転。構造的なスタジオへの重心シフトが鮮明となった。
+        </div>
+
+        <div class="chart-container">
+          <div id="chart-fig-1-1"></div>
+        </div>
+
+        <details class="data-table-details">
+          <summary>
+            <span>表で見る（グラフの元データ）</span>
+            <button class="csv-dl-btn" onclick="exportFig3Ebita()">CSVダウンロード</button>
+          </summary>
+                    <div style="font-size:11px; color:var(--muted); background:rgba(255,255,255,0.02); padding:5px 12px; border-bottom:1px solid var(--line);">
+            ※表とCSVは原典単位（百万ポンド・百万円）。グラフと本文は億ポンド・億円で表示しています。
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table" id="table-fig-1-1">
+              <thead>
+                <tr>
+                  <th>年度 (12月期)</th>
+                  <th>放送 (Broadcast/M&E) [£m]</th>
+                  <th>ITV Studios [£m]</th>
+                  <th>逆転・不連続フラグ</th>
+                  <th>出典</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：</strong>ITV plc 各年決算発表資料（Results Release）Segmental information / adjusted EBITA</div>
+          <div class="fig-notes"><strong>注記：</strong>2021年にBroadcast & OnlineからM&Eへ再編。2024年に部門間配賦見直し。2023年にStudios（2.86億ポンド）が放送（2.05億ポンド）を逆転。</div>
+        </div>
+      </section>
+
+      <!-- 図1-2 -->
+      <section class="fig-card" id="fig-1-2">
+        <div class="fig-card-header">
+          <span class="fig-badge">図1-2</span>
+          <h2 class="fig-title">
+            ITV Studiosの売上：グループ内と外部（2015〜2025年）
+            <a href="#fig-1-2" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          ITV Studiosは自社の放送局向けだけでなく、配信事業者や海外の放送局など外部向けの売上を拡大し、外部向けが約7割、グループ内は約3割（2015〜2025年で28〜35%）となっている。
+        </div>
+
+        <div class="chart-container">
+          <div id="chart-fig-1-2"></div>
+        </div>
+
+        <details class="data-table-details">
+          <summary>
+            <span>表で見る（グラフの元データ）</span>
+            <button class="csv-dl-btn" onclick="exportStudiosRev()">CSVダウンロード</button>
+          </summary>
+                    <div style="font-size:11px; color:var(--muted); background:rgba(255,255,255,0.02); padding:5px 12px; border-bottom:1px solid var(--line);">
+            ※表とCSVは原典単位（百万ポンド・百万円）。グラフと本文は億ポンド・億円で表示しています。
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table" id="table-fig-1-2">
+              <thead>
+                <tr>
+                  <th>年度</th>
+                  <th>外部顧客売上 [£m]</th>
+                  <th>グループ内売上 [£m]</th>
+                  <th>合計売上 [£m]</th>
+                  <th>グループ内比率 (%)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：</strong>ITV plc 各年決算発表資料（Results Release）Segmental information</div>
+          <div class="fig-notes"><strong>注記：</strong>比率は開示値からの算出。グループ内売上には、少なくとも2025年はStudios内部の部門間取引も含まれる（会社開示）。</div>
+        </div>
+      </section>
+
+      <!-- 図1-3 -->
+      <section class="fig-card" id="fig-1-3">
+        <div class="fig-card-header">
+          <span class="fig-badge">図1-3</span>
+          <h2 class="fig-title">
+            放送部門の売上と広告収入（2015〜2025年）
+            <a href="#fig-1-3" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          放送部門の売上・広告収入は横ばいから漸減基調。2018年に広告収入の集計定義がNARからTARへと移行した前後で不連続が生じており、数値を一本の線でつながず区別して記録。
+        </div>
+
+        <div class="chart-container">
+          <div id="chart-fig-1-3"></div>
+        </div>
+
+        <details class="data-table-details">
+          <summary>
+            <span>表で見る（グラフの元データ）</span>
+            <button class="csv-dl-btn" onclick="exportBroadcastRev()">CSVダウンロード</button>
+          </summary>
+                    <div style="font-size:11px; color:var(--muted); background:rgba(255,255,255,0.02); padding:5px 12px; border-bottom:1px solid var(--line);">
+            ※表とCSVは原典単位（百万ポンド・百万円）。グラフと本文は億ポンド・億円で表示しています。
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table" id="table-fig-1-3">
+              <thead>
+                <tr>
+                  <th>年度</th>
+                  <th>放送部門売上 [£m]</th>
+                  <th>広告収入区分</th>
+                  <th>広告収入 [£m]</th>
+                  <th>出典</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：</strong>ITV plc 各年決算発表資料（Results Release）Segmental information</div>
+          <div class="fig-notes"><strong>注記：</strong>2015〜2017年はITV Family NAR（純広告収入）、2018〜2025年は総広告収入（TAR）。定義変更のため2017年と2018年の間で線を切断。</div>
+        </div>
+      </section>
+
+      <!-- 図1-4 -->
+      <section class="fig-card" id="fig-1-4">
+        <div class="fig-card-header">
+          <span class="fig-badge">図1-4</span>
+          <h2 class="fig-title">
+            売却の条件――Sky（Comcast）へのM&E売却合意
+            <a href="#fig-1-4" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          Skyへの放送部門売却は、確定14億ポンド（最大16億ポンド）、EV/EBITDA倍率5.6〜6.4倍で合意。さらに5年間で約21億ポンドの番組供給契約を締結し、スタジオ側の長期販路を確保した。
+        </div>
+
+        <div class="deal-container" id="deal-cards-mount"></div>
+
+        <details class="data-table-details">
+          <summary>
+            <span>表で見る（グラフの元データ）</span>
+            <button class="csv-dl-btn" onclick="exportDealTerms()">CSVダウンロード</button>
+          </summary>
+                    <div style="font-size:11px; color:var(--muted); background:rgba(255,255,255,0.02); padding:5px 12px; border-bottom:1px solid var(--line);">
+            ※表とCSVは原典単位（百万ポンド・百万円）。グラフと本文は億ポンド・億円で表示しています。
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table" id="table-fig-1-4">
+              <thead>
+                <tr>
+                  <th>指標ID</th>
+                  <th>項目名</th>
+                  <th>数値</th>
+                  <th>単位</th>
+                  <th>開示基準</th>
+                  <th>範囲・注記</th>
+                  <th>原典引用</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：ITV plc 2026年7月6日発表（RNS 0606L）、同日の投資家向け説明資料、2025年決算発表</div>
+          <div class="fig-notes"><strong>注記：表の『GUIDANCE』は会社の見通し・試算で、確定した実績ではない。</div>
+        </div>
+      </section>
+
+      <!-- 図1-5 -->
+      <section class="fig-card" id="fig-1-5">
+        <div class="fig-card-header">
+          <span class="fig-badge">図1-5</span>
+          <h2 class="fig-title">
+            部門定義の変更履歴（全15件）
+            <a href="#fig-1-5" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          ITVは2015〜2025年の11年間で15回にわたり部門定義や会計基準（IFRS15/16）、買収・改編を行っており、時系列比較には不連続への配慮が不可欠である。
+        </div>
+
+        <div class="table-wrapper" style="max-height: 400px; border: 1px solid var(--line); border-radius: 6px;">
+          <table class="data-table" id="table-fig-1-5-full">
+            <thead>
+              <tr>
+                <th class="col-year">年度</th>
+                <th class="col-old-seg">変更前セグメント</th>
+                <th class="col-new-seg">変更後セグメント</th>
+                <th class="col-what">変更内容</th>
+                <th class="col-restated">遡及修正</th>
+                <th class="col-continuity">継続性に関する注記</th>
+                <th class="col-quote">原典抜粋 <span style="font-weight:normal; font-size:10.5px; color:var(--muted);">(横スクロール可)</span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：ITV plc 各年決算発表資料</div>
+          <div class="fig-notes"><strong>注記：</strong>各年度の決算報告書における部門区分変更および会計方針変更の全記録。</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         タブ2: フジHD：２本柱
+         ========================================== -->
+    <div id="tab-2" class="tab-pane" role="tabpanel">
+      <div class="tab-header">
+        <h2>2. フジ・メディアHD：２本柱</h2>
+        <p>2018年の「メディア・コンテンツ」と「都市開発・観光」への区分再編から、2026年の都市開発・観光への外部資本導入検討への軌跡。</p>
+      </div>
+
+      <!-- 図2-1 -->
+      <section class="fig-card" id="fig-2-1">
+        <div class="fig-card-header">
+          <span class="fig-badge">図2-1</span>
+          <h2 class="fig-title">
+            ２本柱のセグメント利益（2018〜2026年3月期）
+            <a href="#fig-2-1" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus"><strong>【エビデンスの焦点】</strong> 2018年に「メディア・コンテンツ」と「都市開発・観光」を2本柱とする区分再編を実施。セグメント利益で、都市開発・観光がメディア・コンテンツを上回った年度は2018年3月期、2019年3月期、2024年3月期、2025年3月期、2026年3月期（全9期中5期）。メディア・コンテンツ事業は2025年3月期（-40.9億円）、2026年3月期（-308.4億円）と赤字が拡大している。</div>
+
+        <div class="chart-container">
+          <div id="chart-fig-2-1"></div>
+        </div>
+
+        <details class="data-table-details">
+          <summary>
+            <span>表で見る（グラフの元データ）</span>
+            <button class="csv-dl-btn" onclick="exportFujiTwoPillars()">CSVダウンロード</button>
+          </summary>
+                    <div style="font-size:11px; color:var(--muted); background:rgba(255,255,255,0.02); padding:5px 12px; border-bottom:1px solid var(--line);">
+            ※表とCSVは原典単位（百万ポンド・百万円）。グラフと本文は億ポンド・億円で表示しています。
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table" id="table-fig-2-1">
+              <thead>
+                <tr>
+                  <th>年度</th>
+                  <th>メディア・コンテンツ利益 [百万円]</th>
+                  <th>都市開発・観光利益 [百万円]</th>
+                  <th>合計利益 [百万円]</th>
+                  <th>都市開発比率 (%)</th>
+                  <th>開示基準</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：フジ・メディア・ホールディングス 有価証券報告書（セグメント情報）</div>
+          <div class="fig-notes"><strong>注記：</strong>赤色（#FF0000）はメディア・コンテンツ事業。2021年3月期（コロナ禍）の都市開発・観光は37.3億円の黒字で、メディア・コンテンツ（137.2億円）が利益の中心。2026年3月期は最新開示値。</div>
+        </div>
+      </section>
+
+      <!-- 図2-2 -->
+      <section class="fig-card" id="fig-2-2">
+        <div class="fig-card-header">
+          <span class="fig-badge">図2-2</span>
+          <h2 class="fig-title">
+            状況の時系列――2本柱化から外部資本導入検討へ
+            <a href="#fig-2-2" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          2018年に設定された「2本柱」という切断線が、8年後の2026年における不動産事業への外部資本導入（カーブアウト）検討へと直接つながっている。
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">2018年5月10日</div>
+            <div class="timeline-title">セグメント区分変更の決議（2本柱の明記）</div>
+            <div class="timeline-desc">
+              「メディア及びコンテンツに関連する事業を同一セグメントに集約し収益力強化を進めるとともに、都市開発・観光事業をグループの２本柱の１つと位置づけ」（有価証券報告書 2019年3月期 p.93）
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2025年5月16日</div>
+            <div class="timeline-title">株主提案への取締役会意見（適時開示）</div>
+            <div class="timeline-desc">
+              ダルトン・インベストメンツ系のファンド（Nippon Active Value Fund）が、取締役選任の株主提案の理由の一つに「不動産事業を直ちに税制適格スピンオフすること」を挙げた。取締役会は反対し、都市開発・観光事業は「単に収益不動産への投資を行う不動産事業ではなく」と説明。
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2025年6月25日</div>
+            <div class="timeline-title">定時株主総会で株主提案を否決（臨時報告書）</div>
+            <div class="timeline-desc">
+              株主提案の取締役候補12名は全員否決（賛成率10.43〜27.00%）。
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2026年2月3日</div>
+            <div class="timeline-title">都市開発・観光事業への外部資本の検討開始（適時開示）</div>
+            <div class="timeline-desc">
+              サンケイビルを中心とする都市開発・観光事業の成長及びグループシナジー最大化に向け、戦略的パートナーからの外部資本の検討開始を発表。<br>
+              「同事業の完全な売却も排除するものではない」と明記。同日、大株主（村上世彰氏ら）と自己株式取得に関する契約を結び、総額2,350億円の自己株式取得枠を設定（2026年2月4日 臨時報告書）。
+            </div>
+          </div>
+          <div class="timeline-item warn">
+            <div class="timeline-date">2026年10月6日</div>
+            <div class="timeline-title">最終応札の報道（ロイター）</div>
+            <div class="timeline-desc">
+              サンケイビルの全株売却または一部売却に向けた最終入札が実施された旨が報道される。<br>
+              <strong>※2026年10月22日時点。最新状況を要確認。</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：</strong>フジ・メディア・ホールディングス 有価証券報告書、適時開示資料、各種報道、フジ・メディア・ホールディングス 2025年5月16日 適時開示、2025年6月26日 臨時報告書、2026年2月4日 臨時報告書</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         タブ3: 放送利益の可視性
+         ========================================== -->
+    <div id="tab-3" class="tab-pane" role="tabpanel">
+      <div class="tab-header">
+        <h2>3. 放送の利益は、どこまで見えるか</h2>
+        <p>日本の民放キー局各社において、「放送単独の利益」は、どこまで見えて、どこから見えなくなったか。</p>
+      </div>
+
+      <!-- 図3-1 -->
+      <section class="fig-card" id="fig-3-1">
+        <div class="fig-card-header">
+          <span class="fig-badge">図3-1</span>
+          <h2 class="fig-title">
+            セグメント利益に占める放送の比率（2014〜2026年）
+            <a href="#fig-3-1" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          フジ（2018年）とTBS（2019年）は区分再編により放送単独の利益開示を終了。テレ朝・テレ東は継続しているものの、局ごとに「放送」として開示される利益の範囲が大きく異なる。
+        </div>
+
+        <div class="chart-controls">
+          <span style="font-weight:700; color:var(--muted);">局切り替え:</span>
+          <button class="filter-btn active" data-company="all" onclick="toggleCompanyFilter('all')">全表示</button>
+          <button class="filter-btn" data-company="フジ・メディアHD" onclick="toggleCompanyFilter('フジ・メディアHD')">
+            <span class="color-swatch" style="background:var(--color-cx);"></span>フジ
+          </button>
+          <button class="filter-btn" data-company="TBS HD" onclick="toggleCompanyFilter('TBS HD')">
+            <span class="color-swatch" style="background:var(--color-tbs-darkmode);"></span>TBS
+          </button>
+          <button class="filter-btn" data-company="テレビ朝日HD" onclick="toggleCompanyFilter('テレビ朝日HD')">
+            <span class="color-swatch" style="background:var(--color-ex);"></span>テレ朝
+          </button>
+          <button class="filter-btn" data-company="テレビ東京HD" onclick="toggleCompanyFilter('テレビ東京HD')">
+            <span class="color-swatch" style="background:var(--color-tx);"></span>テレ東
+          </button>
+          <button class="filter-btn" data-company="ITV plc" onclick="toggleCompanyFilter('ITV plc')">
+            <span class="color-swatch" style="background:var(--color-itv);"></span>ITV (英参考)
+          </button>
+        </div>
+
+        <div class="chart-container">
+          <div id="chart-fig-3-1"></div>
+        </div>
+
+        <details class="data-table-details">
+          <summary>
+            <span>表で見る（グラフの元データ）</span>
+            <button class="csv-dl-btn" onclick="exportProfitShare()">CSVダウンロード</button>
+          </summary>
+                    <div style="font-size:11px; color:var(--muted); background:rgba(255,255,255,0.02); padding:5px 12px; border-bottom:1px solid var(--line);">
+            ※表とCSVは原典単位（百万ポンド・百万円）。グラフと本文は億ポンド・億円で表示しています。
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table" id="table-fig-3-1">
+              <thead>
+                <tr>
+                  <th>企業名</th>
+                  <th>区分構造</th>
+                  <th>期</th>
+                  <th>放送利益 [百万円/£m]</th>
+                  <th>全セグメント利益 [百万円/£m]</th>
+                  <th>放送利益比率 (%)</th>
+                  <th>放送区分名</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：各社有価証券報告書（セグメント情報）、ITV plc 各年決算発表資料</div>
+          <div class="fig-notes"><strong>注記：</strong>各局の線色は共通ナレッジ管理の「民放キー局 基本カラー規定」に準拠（フジ：赤 #FF0000、テレ朝：ピンク #FF66FF、TBS：濃紺/インディゴ #4B82F6、テレ東：水色 #00B0F0）。実線＝旧区分、破線＝新区分。区分変更の前後で線をつながない。日本テレビHD（黄 #FFC000）は放送単独利益が一度も開示されていないため線なし。横軸注記：日本＝3月期／ITV＝12月期。比率は開示値からの算出。テレ朝・テレ東の「放送」の利益には、番組制作の利益も含まれる（テレ朝「テレビ放送事業」＝テレビ番組の制作及び放送、テレ東「地上波・BS放送事業」＝番組制作や放送運営等の放送補完事業を含む。各社有価証券報告書）。</div>
+        </div>
+      </section>
+
+      <!-- 図3-2 -->
+      <section class="fig-card" id="fig-3-2">
+        <div class="fig-card-header">
+          <span class="fig-badge">図3-2</span>
+          <h2 class="fig-title">
+            テレ東：同じ年度、二つの線の引き方（2023年3月期）
+            <a href="#fig-3-2" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          同じ年度の事業を二通りの線で切り分けると、放送の比率が32ポイント変わる。
+        </div>
+
+        <div class="chart-container">
+          <div id="chart-fig-3-2"></div>
+        </div>
+
+        <details class="data-table-details">
+          <summary>
+            <span>表で見る（グラフの元データ）</span>
+            <button class="csv-dl-btn" onclick="exportTxCompare()">CSVダウンロード</button>
+          </summary>
+                    <div style="font-size:11px; color:var(--muted); background:rgba(255,255,255,0.02); padding:5px 12px; border-bottom:1px solid var(--line);">
+            ※表とCSVは原典単位（百万ポンド・百万円）。グラフと本文は億ポンド・億円で表示しています。
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table" id="table-fig-3-2">
+              <thead>
+                <tr>
+                  <th>区分構造</th>
+                  <th>対象年度</th>
+                  <th>放送セグメント利益 [百万円]</th>
+                  <th>全社セグメント利益 [百万円]</th>
+                  <th>放送利益比率 (%)</th>
+                  <th>放送に含まれる範囲</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：</strong>テレビ東京ホールディングス 2023年3月期 有価証券報告書（旧区分開示値および翌期比較用新区分開示値）</div>
+          <div class="fig-notes"><strong>注記：</strong>比率は開示値からの算出。比率の分母は、各区分のセグメント利益（調整前）の合計。区分の組み替えで分母も変わる。テレ東カラー（シアン #00B0F0）を基調に表示。同一企業の同一年度における開示区分の切り替えによる見え方の違いを示す。</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         タブ4: 売上で見た立ち位置
+         ========================================== -->
+    <div id="tab-4" class="tab-pane" role="tabpanel">
+      <div class="tab-header">
+        <h2>4. 売上で見た立ち位置</h2>
+        <p>利益単独では追跡できない放送の影響力を、売上比率のスロープ図および利益開示との対比で俯瞰する。</p>
+      </div>
+
+      <!-- 図4-1 -->
+      <section class="fig-card" id="fig-4-1">
+        <div class="fig-card-header">
+          <span class="fig-badge">図4-1</span>
+          <h2 class="fig-title">
+            売上に占める放送の比率（2015年3月期 → 2026年3月期）
+            <a href="#fig-4-1" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          全社共通して売上に占める放送の比率が低下。特にフジ・メディアHD（41.2%→20.2%）や英ITV（57.8%→33.7%）で急激な放送依存度低下が進んでいる。
+        </div>
+
+        <div class="chart-container">
+          <div id="chart-fig-4-1"></div>
+        </div>
+
+        <details class="data-table-details">
+          <summary>
+            <span>表で見る（グラフの元データ）</span>
+            <button class="csv-dl-btn" onclick="exportRevShare()">CSVダウンロード</button>
+          </summary>
+                    <div style="font-size:11px; color:var(--muted); background:rgba(255,255,255,0.02); padding:5px 12px; border-bottom:1px solid var(--line);">
+            ※表とCSVは原典単位（百万ポンド・百万円）。グラフと本文は億ポンド・億円で表示しています。
+          </div>
+          <div class="table-wrapper">
+            <table class="data-table" id="table-fig-4-1">
+              <thead>
+                <tr>
+                  <th>企業名</th>
+                  <th>期間</th>
+                  <th>放送売上 [百万円/£m]</th>
+                  <th>コンテンツ・IP売上 [百万円]</th>
+                  <th>放送外売上 [百万円]</th>
+                  <th>放送売上比率 (%)</th>
+                  <th>出典</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：各社有価証券報告書、ITV plc 各年決算発表資料</div>
+          <div class="fig-notes"><strong>注記：</strong>各社の基本カラー規定に準拠（日テレ：黄、テレ朝：ピンク、TBS：青、テレ東：水色、フジ：赤）。比率は開示値からの算出。ITVは2015年→2025年12月期。ITVは放送収入の定義が国内5社と異なる。</div>
+        </div>
+      </section>
+
+      <!-- 図4-2 -->
+      <section class="fig-card" id="fig-4-2">
+        <div class="fig-card-header">
+          <span class="fig-badge">図4-2</span>
+          <h2 class="fig-title">
+            利益と売上の比較（最新期）
+            <a href="#fig-4-2" class="fig-anchor-link">#</a>
+          </h2>
+        </div>
+        <div class="fig-focus">
+          <strong>【エビデンスの焦点】</strong>
+          売上では全社で放送比率を追跡できる一方、利益面では放送単独の数値を把握できる企業が限られており、開示構造の非対称性が際立っている。
+        </div>
+
+        <div class="table-wrapper" style="border: 1px solid var(--line); border-radius: 6px;">
+          <table class="data-table" id="table-fig-4-2">
+            <thead>
+              <tr>
+                <th>企業名</th>
+                <th>対象年度</th>
+                <th>売上に占める放送の比率 (%)</th>
+                <th>セグメント利益に占める放送の比率 (%)</th>
+                <th>開示状況の注記</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="fig-source-note">
+          <div class="fig-sources"><strong>出典：各社有価証券報告書（セグメント情報）、ITV plc 各年決算発表資料</div>
+          <div class="fig-notes"><strong>注記：</strong>開示上、放送単独の利益が区分されていない場合は「—（開示上、放送単独の利益なし）」と表記。推計で補間しない。テレ朝・テレ東の「放送」の利益には、番組制作の利益も含まれる。</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==========================================
+         タブ5: データと方法
+         ========================================== -->
+    <div id="tab-5" class="tab-pane" role="tabpanel">
+      <div class="tab-header">
+        <h2>5. データと方法</h2>
+        <p>本ダッシュボードのデータセット、定義、期間の前提、不連続の扱い、および全CSVのダウンロード。</p>
+      </div>
+
+      <section class="fig-card">
+        <div class="fig-card-header">
+          <h2 class="fig-title">データダウンロード（全CSVファイル）</h2>
+        </div>
+                  <div style="font-size:11px; color:var(--muted); background:rgba(255,255,255,0.02); padding:5px 12px; border-bottom:1px solid var(--line);">
+            ※表とCSVは原典単位（百万ポンド・百万円）。グラフと本文は億ポンド・億円で表示しています。
+          </div>
+          <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ファイル名</th>
+                <th>内容</th>
+                <th>レコード数</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>itv_segments_timeseries_v1.0.csv</code></td>
+                <td>ITVの部門別売上・調整後EBITA・広告収入・Studiosのグループ内／外部売上（2015〜2025年、当年資料の値、原文行つき）</td>
+                <td>125行</td>
+                <td><button class="csv-dl-btn" onclick="downloadRawCsv('itv_segments_timeseries')">ダウンロード</button></td>
+              </tr>
+              <tr>
+                <td><code>fig3_itv_ebita_v1.0.csv</code></td>
+                <td>放送とStudiosの調整後EBITA（2015〜2025年）</td>
+                <td>22行</td>
+                <td><button class="csv-dl-btn" onclick="downloadRawCsv('fig3_itv_ebita')">ダウンロード</button></td>
+              </tr>
+              <tr>
+                <td><code>itv_deal_terms_v1.0.csv</code></td>
+                <td>2026年Skyへの売却条件（対価、企業価値、倍率、Love Productions、供給契約、売却後の会社指標）</td>
+                <td>48行</td>
+                <td><button class="csv-dl-btn" onclick="downloadRawCsv('itv_deal_terms')">ダウンロード</button></td>
+              </tr>
+              <tr>
+                <td><code>itv_segment_definition_log_v1.0.csv</code></td>
+                <td>ITVの部門定義変更15件の履歴（不連続の注記）</td>
+                <td>15行</td>
+                <td><button class="csv-dl-btn" onclick="downloadRawCsv('itv_segment_definition_log')">ダウンロード</button></td>
+              </tr>
+              <tr>
+                <td><code>fig2_fuji_two_pillars_v1.0.csv</code></td>
+                <td>フジのメディア・コンテンツと都市開発・観光のセグメント利益（2018〜2026年3月期）</td>
+                <td>18行</td>
+                <td><button class="csv-dl-btn" onclick="downloadRawCsv('fig2_fuji_two_pillars')">ダウンロード</button></td>
+              </tr>
+              <tr>
+                <td><code>fig4_broadcast_profit_share_v1.0.csv</code></td>
+                <td>放送の利益比率（日本4局の旧区分／新区分、ITV）と元の開示値</td>
+                <td>50行</td>
+                <td><button class="csv-dl-btn" onclick="downloadRawCsv('fig4_broadcast_profit_share')">ダウンロード</button></td>
+              </tr>
+              <tr>
+                <td><code>jp_segment_change_quotes_v1.0.csv</code></td>
+                <td>日本の区分変更の決議日・適用年度・会社の公式原文・PDFページ</td>
+                <td>6行</td>
+                <td><button class="csv-dl-btn" onclick="downloadRawCsv('jp_segment_change_quotes')">ダウンロード</button></td>
+              </tr>
+              <tr>
+                <td><code>fig6_broadcast_revenue_share_v1.0.csv</code></td>
+                <td>売上に占める放送の比率（2015年・2026年実績値）</td>
+                <td>12行</td>
+                <td><button class="csv-dl-btn" onclick="downloadRawCsv('fig6_broadcast_revenue_share')">ダウンロード</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="fig-card">
+        <div class="fig-card-header">
+          <h2 class="fig-title">方法論と前提条件</h2>
+        </div>
+        <div class="fig-source-note" style="font-size: 13px; line-height: 1.7; color: var(--fg);">
+          <p><strong>1. 指標の定義：</strong><br>
+          日本の民放キー局は有価証券報告書に記載された「報告セグメント利益」（営業利益ベース）を用いています。英国ITV plcは、同社が決算報告で最重要指標として用いる「調整後EBITA（adjusted EBITA）」に基づいています。比率などの算出値にはデータ上で <code>開示値からの算出</code> を付与しています。</p>
+
+          <p><strong>2. 期間の前提：</strong><br>
+          日本各社は3月期（前年4月〜当年3月）、英国ITVは12月期（暦年：1月〜12月）です。両者には約9か月の重なりがありますが、開示元の確定値を厳密に尊重するため、無理な期間変換・推計による調整は行わず、各社の正式開示年度のまま対比しています。</p>
+
+          <p><strong>3. 不連続と非開示の扱い：</strong><br>
+          セグメント区分が変更された前後の数値は、一本の連続した折れ線で接続することを厳禁とし、区切りを明示しています。また、開示上放送単独の数値が存在しない年度・項目（例：日本テレビの放送利益、フジ・TBSの区分変更後など）について、推計値で補間せず「非開示（—）」として扱っています。</p>
+
+          <p><strong>4. カラー規定の準拠：</strong><br>
+          各局の表示カラーは、共通ナレッジ管理（<code>01_Knowledge\MEDIA\民放キー局_基本カラー規定_v1.0.md</code>）で定めた基本カラーパレット（日本テレビ：#FFC000、テレビ朝日：#FF66FF、TBS：#002060/視認性調整色、テレビ東京：#00B0F0、フジテレビ：#FF0000）に統一準拠しています。</p>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- App Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-title">テレビ局は何で稼いでいるか――英ITVと民放キー局5社の事業別損益</div>
+      <div class="footer-sub">企画・分析・データ設計：Naohisa Hashimoto（Media Architect）</div>
+      <div class="footer-sub">数値の出典：ITV plc 各年決算発表資料、日本の民放各社 有価証券報告書および適時開示資料</div>
+    </div>
+  </footer>
+
+  <!-- 外部データスクリプト -->
+  <script src="data_v1.1.js"></script>
+
+  <!-- アプリケーション・ロジック -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const DATA = window.DATA_V1;
+      const EN = window.__LANG === "en"; // v1.57: 英語表示では軸目盛りを£m・¥bnにする（v1.58: 日本語のツールチップ・表見出しの単位を百万単位に訂正）
+      let currentCompanyFilter = "all";
+
+      if (!DATA) {
+        console.error("DATA_V1 is not loaded!");
+        return;
+      }
+
+      // --- グラフ共通ツールチップ管理 ---
+      const chartTooltip = document.createElement("div");
+      chartTooltip.id = "chart-tooltip";
+      chartTooltip.className = "chart-tooltip";
+      document.body.appendChild(chartTooltip);
+
+      function updateTooltipPos(clientX, clientY) {
+        let x = clientX;
+        let y = clientY - 12;
+        const rect = chartTooltip.getBoundingClientRect();
+        if (x - rect.width / 2 < 12) x = rect.width / 2 + 12;
+        if (x + rect.width / 2 > window.innerWidth - 12) x = window.innerWidth - rect.width / 2 - 12;
+        if (y - rect.height < 12) {
+          y = clientY + 24 + rect.height;
+        }
+        chartTooltip.style.left = `${x}px`;
+        chartTooltip.style.top = `${y}px`;
+      }
+
+      document.addEventListener("mouseover", function(e) {
+        const el = e.target.closest("[data-tt-val]");
+        if (el) {
+          const title = el.getAttribute("data-tt-title") || "";
+          const label = el.getAttribute("data-tt-label") || "";
+          const val = el.getAttribute("data-tt-val") || "";
+          const color = el.getAttribute("data-tt-color") || "#60a5fa";
+          const note = el.getAttribute("data-tt-note") || "";
+
+          chartTooltip.innerHTML = `
+            ${title ? `<div class="tt-title">${title}</div>` : ""}
+            <div class="tt-row">
+              <span class="tt-dot" style="background:${color};"></span>
+              <span class="tt-label">${label}</span>
+              <span class="tt-val">${val}</span>
+            </div>
+            ${note ? `<div class="tt-note">${note}</div>` : ""}
+          `;
+          chartTooltip.classList.add("visible");
+          updateTooltipPos(e.clientX, e.clientY);
+        }
+      });
+
+      document.addEventListener("mousemove", function(e) {
+        if (chartTooltip.classList.contains("visible")) {
+          updateTooltipPos(e.clientX, e.clientY);
+        }
+      });
+
+      document.addEventListener("mouseout", function(e) {
+        const el = e.target.closest("[data-tt-val]");
+        if (el) {
+          chartTooltip.classList.remove("visible");
+        }
+      });
+
+      document.addEventListener("touchstart", function(e) {
+        const el = e.target.closest("[data-tt-val]");
+        if (el && e.touches.length > 0) {
+          const touch = e.touches[0];
+          const title = el.getAttribute("data-tt-title") || "";
+          const label = el.getAttribute("data-tt-label") || "";
+          const val = el.getAttribute("data-tt-val") || "";
+          const color = el.getAttribute("data-tt-color") || "#60a5fa";
+          const note = el.getAttribute("data-tt-note") || "";
+
+          chartTooltip.innerHTML = `
+            ${title ? `<div class="tt-title">${title}</div>` : ""}
+            <div class="tt-row">
+              <span class="tt-dot" style="background:${color};"></span>
+              <span class="tt-label">${label}</span>
+              <span class="tt-val">${val}</span>
+            </div>
+            ${note ? `<div class="tt-note">${note}</div>` : ""}
+          `;
+          chartTooltip.classList.add("visible");
+          updateTooltipPos(touch.clientX, touch.clientY);
+        } else if (!e.target.closest("#chart-tooltip")) {
+          chartTooltip.classList.remove("visible");
+        }
+      }, { passive: true });
+
+      // --- 基本カラー規定の定数定義 ---
+      const BROADCASTER_COLORS = {
+        "日本テレビHD": "#FFC000",
+        "テレビ朝日HD": "#FF66FF",
+        "TBS HD": "#4b82f6", // ダークテーマ視認性配慮ブルー
+        "テレビ東京HD": "#00B0F0",
+        "フジ・メディアHD": "#FF0000",
+        "ITV plc": "#8a93a1"
+      };
+
+      // --- タブ切り替え制御 ---
+      const tabBtns = document.querySelectorAll(".nav-tab-btn");
+      const tabPanes = document.querySelectorAll(".tab-pane");
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const targetId = btn.getAttribute("data-tab");
+          tabBtns.forEach(b => {
+            b.setAttribute("aria-selected", "false");
+          });
+          btn.setAttribute("aria-selected", "true");
+
+          tabPanes.forEach(pane => {
+            if (pane.id === targetId) {
+              pane.classList.add("active");
+            } else {
+              pane.classList.remove("active");
+            }
+          });
+        });
+      });
+
+      // ハッシュリンクによるタブ自動遷移
+      function handleHash() {
+        let hash = window.location.hash;
+        if (!hash) return;
+        if (hash === "#fig-5-1") hash = "#fig-4-1";
+        if (hash === "#fig-5-2") hash = "#fig-4-2";
+
+        const targetEl = document.querySelector(hash);
+        if (!targetEl) return;
+        const parentPane = targetEl.closest(".tab-pane");
+        if (parentPane) {
+          const tabId = parentPane.id;
+          const matchingBtn = document.querySelector(`.nav-tab-btn[data-tab="${tabId}"]`);
+          if (matchingBtn) matchingBtn.click();
+          targetEl.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+      window.addEventListener("hashchange", handleHash);
+      if (window.location.hash) setTimeout(handleHash, 100);
+
+      // --- CSVダウンロードヘルパー ---
+      window.downloadCsvFile = function(filename, csvContent) {
+        const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      window.downloadRawCsv = function(key) {
+        const rows = DATA.raw_csvs[key];
+        if (!rows || rows.length === 0) return;
+        const headers = Object.keys(rows[0]);
+        const lines = [headers.join(",")];
+        rows.forEach(r => {
+          const vals = headers.map(h => {
+            let v = r[h] !== undefined ? String(r[h]) : "";
+            if (v.includes(",") || v.includes('"') || v.includes("\n")) {
+              v = '"' + v.replace(/"/g, '""') + '"';
+            }
+            return v;
+          });
+          lines.push(vals.join(","));
+        });
+        downloadCsvFile(key + "_v1.0.csv", lines.join("\n"));
+      };
+
+      // --- タブ1: ITV チャート・テーブルの描画 ---
+      renderFig1_1();
+      renderFig1_2();
+      renderFig1_3();
+      renderFig1_4();
+      renderFig1_5();
+
+      // --- タブ2: フジHD チャート・テーブルの描画 ---
+      renderFig2_1();
+
+      // --- タブ3: 放送利益の可視性 チャート・テーブル ---
+      renderFig3_1();
+      renderFig3_2();
+
+      // --- タブ4: 売上比率スロープ図と対比表 ---
+      renderFig4_1();
+      renderFig4_2();
+
+      // =========================================================================
+      // 実装関数群
+      // =========================================================================
+
+      // --- [図1-1] ITV 部門別調整後EBITA (折れ線) ---
+      function renderFig1_1() {
+        const d = DATA.charts.fig1_1;
+        const mount = document.getElementById("chart-fig-1-1");
+        const tbody = document.querySelector("#table-fig-1-1 tbody");
+
+        let tableRowsHtml = "";
+        d.years.forEach((y, i) => {
+          const bVal = d.broadcast[i].value;
+          const sVal = d.studios[i].value;
+          let note = "";
+          if (y === 2021) note = "部門再編（M&E新設）";
+          if (y === 2023) note = "★Studiosが放送を逆転";
+          if (y === 2024) note = "部門間配賦見直し";
+          tableRowsHtml += `<tr>
+            <td class="num">${y}年12月期</td>
+            <td class="num">${bVal !== null ? bVal.toFixed(1) : "—"}</td>
+            <td class="num">${sVal !== null ? sVal.toFixed(1) : "—"}</td>
+            <td>${note}</td>
+            <td>ITV Results Release</td>
+          </tr>`;
+        });
+        tbody.innerHTML = tableRowsHtml;
+
+        const w = 840, h = 340;
+        const pad = { top: 32, right: 65, bottom: 40, left: 55 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+
+        const minY = 0, maxY = 700;
+        const minX = 2015, maxX = 2025;
+
+        function getX(yr) { return pad.left + ((yr - minX) / (maxX - minX)) * plotW; }
+        function getY(val) { return pad.top + plotH - ((val - minY) / (maxY - minY)) * plotH; }
+
+        let bcastPts = [], studiosPts = [];
+        d.years.forEach((yr, i) => {
+          const b = d.broadcast[i].value;
+          const s = d.studios[i].value;
+          if (b !== null) bcastPts.push(`${getX(yr)},${getY(b)}`);
+          if (s !== null) studiosPts.push(`${getX(yr)},${getY(s)}`);
+        });
+
+        let svg = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="background:#111726; border-radius:6px; font-family:var(--f-mono);">`;
+
+        for (let v = 0; v <= maxY; v += 100) {
+          const yPos = getY(v);
+          const labelVal = v === 0 ? "0" : (EN ? String(v) : (v / 100).toFixed(0));
+          svg += `<line x1="${pad.left}" y1="${yPos}" x2="${w - pad.right}" y2="${yPos}" stroke="#1d2433" stroke-width="1"/>
+            <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="10" text-anchor="end">${labelVal}</text>`;
+        }
+        svg += `<text x="${pad.left - 8}" y="${pad.top - 14}" fill="#8a93a1" font-size="10" text-anchor="end">億ポンド</text>`;
+
+        d.years.forEach(yr => {
+          const xPos = getX(yr);
+          svg += `<line x1="${xPos}" y1="${pad.top}" x2="${xPos}" y2="${h - pad.bottom}" stroke="#1d2433" stroke-width="1"/>
+            <text x="${xPos}" y="${h - pad.bottom + 18}" fill="#8a93a1" font-size="11" text-anchor="middle">${yr}</text>`;
+        });
+
+        // 区分見直し線
+        d.discontinuities.forEach(disc => {
+          const xPos = getX(disc.year);
+          svg += `
+            <line class="chart-annotation" x1="${xPos}" y1="${pad.top}" x2="${xPos}" y2="${h - pad.bottom}" stroke="#9cc2f0" stroke-width="1.5" stroke-dasharray="4,4"/>
+            <text class="chart-annotation" x="${xPos}" y="${pad.top - 6}" fill="#9cc2f0" font-size="9.5" text-anchor="middle">${disc.year}年 区分見直し</text>
+          `;
+        });
+
+        svg += `<polyline points="${bcastPts.join(" ")}" fill="none" stroke="#60a5fa" stroke-width="3"/>`;
+        svg += `<polyline points="${studiosPts.join(" ")}" fill="none" stroke="#ffb35c" stroke-width="3"/>`;
+
+        d.years.forEach((yr, i) => {
+          const b = d.broadcast[i].value;
+          const s = d.studios[i].value;
+          let note = "";
+          if (yr === 2021) note = "部門再編（M&E新設）";
+          if (yr === 2023) note = "★Studiosが放送を逆転";
+          if (yr === 2024) note = "部門間配賦見直し";
+
+          if (b !== null) {
+            svg += `<circle class="chart-point" cx="${getX(yr)}" cy="${getY(b)}" r="4.5" fill="#60a5fa" stroke="#111726" stroke-width="1.5"
+              data-tt-title="${yr}年12月期"
+              data-tt-label="放送 (M&E) 調整後EBITA"
+              data-tt-val="${(b / 100).toFixed(2)}億ポンド"
+              data-tt-color="#60a5fa"
+              data-tt-note="原典開示: £${b}m${note ? ' / ' + note : ''}"/>`;
+          }
+          if (s !== null) {
+            svg += `<circle class="chart-point" cx="${getX(yr)}" cy="${getY(s)}" r="4.5" fill="#ffb35c" stroke="#111726" stroke-width="1.5"
+              data-tt-title="${yr}年12月期"
+              data-tt-label="ITV Studios 調整後EBITA"
+              data-tt-val="${(s / 100).toFixed(2)}億ポンド"
+              data-tt-color="#ffb35c"
+              data-tt-note="原典開示: £${s}m${note ? ' / ' + note : ''}"/>`;
+          }
+        });
+
+        // 1. 2015年 放送ピーク値 (青い折れ線の下側・空白エリアに引き出し線＋吹き出し配置)
+        const p15X = getX(2015);
+        const p15Y = getY(659);
+        const peakBoxW = 94, peakBoxH = 20;
+        const peakBoxX = p15X + 26;
+        const peakBoxY = p15Y + 18;
+        svg += `
+          <g class="chart-annotation">
+            <polyline points="${p15X},${p15Y + 5} ${p15X + 16},${peakBoxY + peakBoxH / 2} ${peakBoxX},${peakBoxY + peakBoxH / 2}" fill="none" stroke="#60a5fa" stroke-width="1.2"/>
+            <circle cx="${p15X}" cy="${p15Y + 5}" r="1.5" fill="#60a5fa"/>
+            <rect x="${peakBoxX}" y="${peakBoxY}" width="${peakBoxW}" height="${peakBoxH}" fill="#1e293b" rx="4" stroke="#60a5fa" stroke-width="1"/>
+            <text x="${peakBoxX + peakBoxW / 2}" y="${peakBoxY + 13.5}" fill="#93c5fd" font-size="9.5" font-weight="bold" text-anchor="middle">ピーク 6.59億</text>
+          </g>
+        `;
+
+        // 2. 2023年 逆転点 (2022年と2023年の間の上部・目盛り4〜5付近に配置)
+        const crossX = getX(2023);
+        const crossYStudios = getY(286);
+        const crossYBroadcast = getY(205);
+        const boxW = EN ? 196 : 138, boxH = 34;
+        const boxX = 562; // 2022年(559)の右、2023年(631)をまたぐ位置
+        const boxY = 115; // 目盛り4〜5の間(Y=108.6〜146.8)
+
+        svg += `
+          <g class="chart-annotation">
+            <circle cx="${crossX}" cy="${crossYStudios}" r="6.5" fill="none" stroke="#ffb35c" stroke-width="2.5" filter="drop-shadow(0 0 6px #ffb35c)"/>
+            <line x1="${crossX}" y1="${crossYStudios - 8}" x2="${crossX}" y2="${boxY + boxH}" stroke="#ffb35c" stroke-width="1.2" stroke-dasharray="2,2"/>
+            <circle cx="${crossX}" cy="${crossYStudios - 8}" r="2" fill="#ffb35c"/>
+            <rect x="${boxX}" y="${boxY}" width="${boxW}" height="${boxH}" fill="#22180d" rx="4" stroke="#ffb35c" stroke-width="1" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.6))"/>
+            <text x="${boxX + boxW / 2}" y="${boxY + 14}" fill="#ffb35c" font-size="9.5" font-weight="bold" text-anchor="middle">2023年 利益逆転</text>
+            <text x="${boxX + boxW / 2}" y="${boxY + 27}" fill="#ffb35c" font-size="8.5" text-anchor="middle">Studios 2.86億 / 放送 2.05億</text>
+          </g>
+        `;
+
+        // 3. 2025年 最新値
+        const p25X = getX(2025);
+        const p25YB = getY(234);
+        const p25YS = getY(297);
+        svg += `
+          <g class="chart-annotation">
+            <text x="${p25X + 6}" y="${p25YS + 4}" fill="#ffb35c" font-size="9" font-weight="bold">2.97億</text>
+            <text x="${p25X + 6}" y="${p25YB + 4}" fill="#60a5fa" font-size="9" font-weight="bold">2.34億</text>
+          </g>
+        `;
+
+        // 4. 凡例 (上部余白 y=16 に横一列配置。2021年見直し線 x=487 との間に70px以上のマージン)
+        svg += `
+          <g transform="translate(80, 16)">
+            <line x1="0" y1="0" x2="16" y2="0" stroke="#60a5fa" stroke-width="2.5"/>
+            <circle cx="8" cy="0" r="3" fill="#60a5fa"/>
+            <text x="22" y="4" fill="#eef1f5" font-size="10.5">放送 (Broadcast & Online → M&E)</text>
+
+            <line x1="${EN ? 272 : 225}" y1="0" x2="${EN ? 288 : 241}" y2="0" stroke="#ffb35c" stroke-width="2.5"/>
+            <circle cx="${EN ? 280 : 233}" cy="0" r="3.5" fill="#ffb35c"/>
+            <text x="${EN ? 294 : 247}" y="4" fill="#eef1f5" font-size="10.5">ITV Studios</text>
+          </g>
+        `;
+
+        svg += `</svg>`;
+        mount.innerHTML = svg;
+      }
+
+      window.exportFig3Ebita = () => downloadRawCsv("fig3_itv_ebita");
+
+      // --- [図1-2] ITV Studios 売上: 積み上げ棒 ---
+      function renderFig1_2() {
+        const d = DATA.charts.fig1_2;
+        const mount = document.getElementById("chart-fig-1-2");
+        const tbody = document.querySelector("#table-fig-1-2 tbody");
+
+        let tableRowsHtml = "";
+        d.forEach(r => {
+          tableRowsHtml += `<tr>
+            <td class="num">${r.year}</td>
+            <td class="num">${r.external_rev.toFixed(1)}</td>
+            <td class="num">${r.internal_rev.toFixed(1)}</td>
+            <td class="num">${r.total_rev.toFixed(1)}</td>
+            <td class="num">${r.internal_share_pct.toFixed(1)}%</td>
+          </tr>`;
+        });
+        tbody.innerHTML = tableRowsHtml;
+
+        const w = 840, h = 340;
+        const pad = { top: 35, right: 30, bottom: 40, left: 55 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+        const maxY = 2500;
+
+        function getY(v) { return pad.top + plotH - (v / maxY) * plotH; }
+        const barW = plotW / d.length * 0.65;
+
+        let svg = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="background:#111726; border-radius:6px; font-family:var(--f-mono);">`;
+
+        for (let v = 0; v <= maxY; v += 500) {
+          const yPos = getY(v);
+          const labelVal = v === 0 ? "0" : (EN ? String(v) : (v / 100).toFixed(0));
+          svg += `<line x1="${pad.left}" y1="${yPos}" x2="${w - pad.right}" y2="${yPos}" stroke="#1d2433" stroke-width="1"/>
+            <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="10" text-anchor="end">${labelVal}</text>`;
+        }
+        svg += `<text x="${pad.left - 8}" y="${pad.top - 12}" fill="#8a93a1" font-size="10" text-anchor="end">億ポンド</text>`;
+
+        d.forEach((item, i) => {
+          const x = pad.left + (i + 0.5) * (plotW / d.length) - barW / 2;
+          const extH = (item.external_rev / maxY) * plotH;
+          const intH = (item.internal_rev / maxY) * plotH;
+          const totalY = getY(item.total_rev);
+
+          // 外部顧客売上
+          svg += `<rect class="chart-bar" x="${x}" y="${getY(item.external_rev)}" width="${barW}" height="${extH}" fill="#3b82f6" rx="2"
+            data-tt-title="${item.year}年12月期"
+            data-tt-label="Studios 外部顧客売上（外販）"
+            data-tt-val="${(item.external_rev / 100).toFixed(2)}億ポンド"
+            data-tt-color="#3b82f6"
+            data-tt-note="Studios合計: ${(item.total_rev / 100).toFixed(2)}億ポンド (原典: £${item.external_rev}m)"/>`;
+
+          // グループ内売上
+          svg += `<rect class="chart-bar" x="${x}" y="${totalY}" width="${barW}" height="${intH}" fill="#ffb35c" rx="2"
+            data-tt-title="${item.year}年12月期"
+            data-tt-label="Studios グループ内売上"
+            data-tt-val="${(item.internal_rev / 100).toFixed(2)}億ポンド"
+            data-tt-color="#ffb35c"
+            data-tt-note="社内依存比率: ${item.internal_share_pct}% (原典: £${item.internal_rev}m)"/>`;
+
+          svg += `<text class="chart-annotation" x="${x + barW / 2}" y="${h - pad.bottom + 18}" fill="#8a93a1" font-size="11" text-anchor="middle">${item.year}</text>`;
+          svg += `<text class="chart-annotation" x="${x + barW / 2}" y="${totalY - 6}" fill="#ffb35c" font-size="9.5" font-weight="bold" text-anchor="middle">${item.internal_share_pct}%</text>`;
+        });
+
+        svg += `
+          <g transform="translate(${pad.left + 20}, ${pad.top - 10})">
+            <rect x="0" y="0" width="12" height="12" fill="#ffb35c" rx="2"/>
+            <text x="18" y="10" fill="#eef1f5" font-size="11">グループ内売上 (棒上部は社内比率)</text>
+            <rect x="${EN ? 345 : 220}" y="0" width="12" height="12" fill="#3b82f6" rx="2"/>
+            <text x="${EN ? 363 : 238}" y="10" fill="#eef1f5" font-size="11">外部顧客売上（外販）</text>
+          </g>
+        `;
+
+        svg += `</svg>`;
+        mount.innerHTML = svg;
+      }
+
+      window.exportStudiosRev = () => downloadRawCsv("itv_segments_timeseries");
+
+      // --- [図1-3] 放送部門の売上と広告収入 (折れ線・切断あり) ---
+      function renderFig1_3() {
+        const d = DATA.charts.fig1_3;
+        const mount = document.getElementById("chart-fig-1-3");
+        const tbody = document.querySelector("#table-fig-1-3 tbody");
+
+        let tableRowsHtml = "";
+        d.broadcast_revenue.forEach(r => {
+          const yr = r.year;
+          const nar = d.ad_revenue_nar.find(x => x.year === yr);
+          const tar = d.ad_revenue_tar.find(x => x.year === yr);
+          const adType = nar ? "NAR (純広告収入)" : (tar ? "TAR (総広告収入)" : "—");
+          const adVal = nar ? nar.value : (tar ? tar.value : null);
+
+          tableRowsHtml += `<tr>
+            <td class="num">${yr}</td>
+            <td class="num">${r.value.toFixed(1)}</td>
+            <td>${adType}</td>
+            <td class="num">${adVal !== null ? adVal.toFixed(1) : "—"}</td>
+            <td>${r.source_id}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = tableRowsHtml;
+
+        const w = 840, h = 340;
+        const pad = { top: 35, right: 30, bottom: 40, left: 55 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+        const minY = 0, maxY = 2500;
+        const minX = 2015, maxX = 2025;
+
+        function getX(yr) { return pad.left + ((yr - minX) / (maxX - minX)) * plotW; }
+        function getY(val) { return pad.top + plotH - (val / maxY) * plotH; }
+
+        let svg = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="background:#111726; border-radius:6px; font-family:var(--f-mono);">`;
+
+        for (let v = 0; v <= maxY; v += 500) {
+          const yPos = getY(v);
+          const labelVal = v === 0 ? "0" : (EN ? String(v) : (v / 100).toFixed(0));
+          svg += `<line x1="${pad.left}" y1="${yPos}" x2="${w - pad.right}" y2="${yPos}" stroke="#1d2433" stroke-width="1"/>
+            <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="10" text-anchor="end">${labelVal}</text>`;
+        }
+        svg += `<text x="${pad.left - 8}" y="${pad.top - 12}" fill="#8a93a1" font-size="10" text-anchor="end">億ポンド</text>`;
+
+        for (let yr = minX; yr <= maxX; yr++) {
+          const xPos = getX(yr);
+          svg += `<line x1="${xPos}" y1="${pad.top}" x2="${xPos}" y2="${h - pad.bottom}" stroke="#1d2433" stroke-width="1"/>
+            <text x="${xPos}" y="${h - pad.bottom + 18}" fill="#8a93a1" font-size="11" text-anchor="middle">${yr}</text>`;
+        }
+
+        const bPts = d.broadcast_revenue.map(r => `${getX(r.year)},${getY(r.value)}`);
+        svg += `<polyline points="${bPts.join(" ")}" fill="none" stroke="#9cc2f0" stroke-width="2.5"/>`;
+
+        const narPts = d.ad_revenue_nar.map(r => `${getX(r.year)},${getY(r.value)}`);
+        svg += `<polyline points="${narPts.join(" ")}" fill="none" stroke="#ffb35c" stroke-width="2.5"/>`;
+
+        const tarPts = d.ad_revenue_tar.map(r => `${getX(r.year)},${getY(r.value)}`);
+        svg += `<polyline points="${tarPts.join(" ")}" fill="none" stroke="#ffb35c" stroke-width="2.5" stroke-dasharray="4,2"/>`;
+
+        const cutX = (getX(2017) + getX(2018)) / 2;
+        const badgeY = getY(1150); // 折れ線グラフ（£2100、£1700）と干渉しない空白エリア（£1150付近）に配置
+        svg += `
+          <line x1="${cutX}" y1="${pad.top}" x2="${cutX}" y2="${h - pad.bottom}" stroke="#ffb35c" stroke-width="1.5" stroke-dasharray="2,3"/>
+          <rect x="${cutX - 54}" y="${badgeY - 11}" width="108" height="22" fill="#22180d" rx="4" stroke="#ffb35c" stroke-width="1.2" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"/>
+          <text x="${cutX}" y="${badgeY + 4}" fill="#ffb35c" font-size="10" font-weight="bold" text-anchor="middle">定義切替 (NAR→TAR)</text>
+        `;
+
+        d.broadcast_revenue.forEach(r => {
+          svg += `<circle class="chart-point" cx="${getX(r.year)}" cy="${getY(r.value)}" r="4.5" fill="#9cc2f0" stroke="#111726" stroke-width="1.5"
+            data-tt-title="${r.year}年12月期"
+            data-tt-label="放送部門売上"
+            data-tt-val="${(r.value / 100).toFixed(2)}億ポンド"
+            data-tt-color="#9cc2f0"
+            data-tt-note="原典: £${r.value}m (${r.source_id})"/>`;
+        });
+        d.ad_revenue_nar.forEach(r => {
+          svg += `<circle class="chart-point" cx="${getX(r.year)}" cy="${getY(r.value)}" r="4.5" fill="#ffb35c" stroke="#111726" stroke-width="1.5"
+            data-tt-title="${r.year}年12月期"
+            data-tt-label="純広告収入 (NAR)"
+            data-tt-val="${(r.value / 100).toFixed(2)}億ポンド"
+            data-tt-color="#ffb35c"
+            data-tt-note="原典: £${r.value}m (2015-17 純広告)"/>`;
+        });
+        d.ad_revenue_tar.forEach(r => {
+          svg += `<circle class="chart-point" cx="${getX(r.year)}" cy="${getY(r.value)}" r="4.5" fill="#ffb35c" stroke="#111726" stroke-width="1.5"
+            data-tt-title="${r.year}年12月期"
+            data-tt-label="総広告収入 (TAR)"
+            data-tt-val="${(r.value / 100).toFixed(2)}億ポンド"
+            data-tt-color="#ffb35c"
+            data-tt-note="原典: £${r.value}m (2018-25 総広告 / 配信広告含む)"/>`;
+        });
+
+        svg += `
+          <g transform="translate(${pad.left + 20}, ${pad.top - 12})">
+            <line x1="0" y1="0" x2="20" y2="0" stroke="#9cc2f0" stroke-width="2.5"/>
+            <circle cx="10" cy="0" r="3" fill="#9cc2f0"/>
+            <text x="26" y="4" fill="#eef1f5" font-size="11">放送部門売上</text>
+
+            <line x1="${EN ? 245 : 140}" y1="0" x2="${EN ? 265 : 160}" y2="0" stroke="#ffb35c" stroke-width="2.5"/>
+            <circle cx="${EN ? 255 : 150}" cy="0" r="3" fill="#ffb35c"/>
+            <text x="${EN ? 271 : 166}" y="4" fill="#eef1f5" font-size="11">2015-17: NAR (純広告)</text>
+
+            <line x1="${EN ? 495 : 310}" y1="0" x2="${EN ? 515 : 330}" y2="0" stroke="#ffb35c" stroke-width="2.5" stroke-dasharray="4,2"/>
+            <circle cx="${EN ? 505 : 320}" cy="0" r="3.5" fill="#ffb35c"/>
+            <text x="${EN ? 521 : 336}" y="4" fill="#eef1f5" font-size="11">2018-25: TAR (総広告)</text>
+          </g>
+        `;
+
+        svg += `</svg>`;
+        mount.innerHTML = svg;
+      }
+
+      window.exportBroadcastRev = () => downloadRawCsv("itv_segments_timeseries");
+
+      // --- [図1-4] 売却条件 (億ポンド・億円統一 ＆ 3ブロック構造 Ver 1.4) ---
+      function renderFig1_4() {
+        const mount = document.getElementById("deal-cards-mount");
+        const tbody = document.querySelector("#table-fig-1-4 tbody");
+
+        let html = `
+          <!-- ブロック1: 対価の構造 -->
+          <div class="deal-group">
+            <div class="deal-group-header">
+              <div class="deal-group-title">
+                <span style="color:var(--warn)">①</span> 対価の構造（最大16億ポンドの内訳）
+              </div>
+              <div class="deal-group-subtitle">基本対価 14億ポンド ＋ 条件付きの追加対価 最大2億ポンド</div>
+            </div>
+
+            <div style="font-size:11px; color:var(--muted); display:flex; justify-content:space-between; margin-bottom:2px;">
+              <span>対価上限：最大 16億ポンド</span>
+              <span>基本対価：14億ポンド</span>
+            </div>
+            <div class="deal-breakdown-bar">
+              <div class="deal-bar-seg" style="width:75%; background:#3b82f6;" title="完了時の現金: 12億ポンド (75%)"></div>
+              <div class="deal-bar-seg" style="width:12.5%; background:#10b981;" title="制作会社の譲受: 2億ポンド (12.5%)"></div>
+              <div class="deal-bar-seg" style="width:12.5%; background:#f59e0b; opacity:0.6; border-left:1px dashed #fff;" title="条件付き追加対価: 最大2億ポンド (12.5%)"></div>
+            </div>
+
+            <div class="deal-cards-row">
+              <div class="deal-card-compact primary">
+                <div class="lbl"><span>基本対価</span><span style="color:#3b82f6; font-size:10px;">完了時</span></div>
+                <div class="val">14億ポンド</div>
+                <div class="sub">現金 12億ポンド ＋ 制作会社持分 2億ポンド</div>
+              </div>
+
+              <div class="deal-card-compact">
+                <div class="lbl"><span>完了時の現金</span><span style="color:#3b82f6; font-size:10px;">キャッシュ</span></div>
+                <div class="val">12億ポンド</div>
+                <div class="sub">取引完了時に受け取る現金</div>
+              </div>
+
+              <div class="deal-card-compact">
+                <div class="lbl"><span>制作会社の譲受</span><span style="color:#10b981; font-size:10px;">事業で受取</span></div>
+                <div class="val">2億ポンド</div>
+                <div class="sub">Sky傘下の制作会社Love Productions（評価額2億ポンド）</div>
+              </div>
+
+              <div class="deal-card-compact">
+                <div class="lbl"><span>条件付追加対価</span><span style="color:#f59e0b; font-size:10px;">条件付き</span></div>
+                <div class="val">最大 2億ポンド</div>
+                <div class="sub">2027年度の総広告収入が17億ポンドを超えた場合。超過1ポンドにつき2ポンド、上限2億ポンド（2028年後半に支払い）</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ブロック2: 企業価値の評価倍率 -->
+          <div class="deal-group">
+            <div class="deal-group-header">
+              <div class="deal-group-title">
+                <span style="color:var(--warn)">②</span> 企業価値の評価倍率（バリュエーション）
+              </div>
+              <div class="deal-group-subtitle">会社開示：同業の過去の取引と同水準（5.6〜6.4倍）</div>
+            </div>
+
+            <div class="deal-cards-row">
+              <div class="deal-card-compact primary">
+                <div class="lbl"><span>EV/EBITDA倍率</span><span>マルチプル</span></div>
+                <div class="val">5.6倍 〜 6.4倍</div>
+                <div class="sub">下限5.6倍（確定基準）〜 上限6.4倍（最大対価基準）</div>
+              </div>
+
+              <div class="deal-card-compact">
+                <div class="lbl"><span>企業価値 (EV)</span><span>全体評価</span></div>
+                <div class="val">14億 〜 16億ポンド</div>
+                <div class="sub">放送部門（M&E）の企業価値。2025年のEBITDA 2.49億ポンドに対する倍率</div>
+              </div>
+
+              <div class="deal-card-compact">
+                <div class="lbl"><span>算定基礎EBITDA</span><span>収益力</span></div>
+                <div class="val">2.49億ポンド</div>
+                <div class="sub">調整後EBITA 2.34億ポンド ＋ 減価償却 1,500万ポンド</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ブロック3: 売却後もつながる取引 -->
+          <div class="deal-group">
+            <div class="deal-group-header">
+              <div class="deal-group-title">
+                <span style="color:var(--warn)">③</span> 売却後もつながる取引
+              </div>
+              <div class="deal-group-subtitle">売却の完了時に、ITV Studiosと売却後の放送事業・Skyが番組供給契約を結ぶ（会社開示）</div>
+            </div>
+
+            <div class="deal-cards-row">
+              <div class="deal-card-compact primary" style="border-color:rgba(16,185,129,0.4); background:rgba(16,185,129,0.05); grid-column: span 2;">
+                <div class="lbl"><span>番組供給契約（CSA）</span></div>
+                <div class="val" style="color:#10b981;">最低 約21億ポンド（2028〜2032年）</div>
+                <div class="sub" style="color:#eef1f5; font-size:11.5px; margin-top:4px;">
+                  年平均で約4.2億ポンド。2025年のグループ内売上（スタジオ内部取引を除く約5.2億ポンド）の約8割に相当。放送市場の縮小も織り込んだ最低水準
+                </div>
+              </div>
+
+              <div class="deal-card-compact">
+                <div class="lbl"><span>制作会社Love Productionsの獲得</span><span style="color:#10b981; font-size:10px;">IP強化</span></div>
+                <div class="val">評価額 2億ポンド</div>
+                <div class="sub">『The Great British Bake Off』などのIPを持つ制作会社をSkyから譲り受ける。2025年のEBITDAは約2,400万ポンド（評価倍率は約8倍）</div>
+              </div>
+
+              <div class="deal-card-compact">
+                <div class="lbl"><span>売却後のITV Studios（試算）</span><span class="guidance-tag">試算</span></div>
+                <div class="val">売上 約21億ポンド／EBITDA 約3.3億ポンド</div>
+                <div class="sub">EBITDAマージン約16%（Love Productionsの取込み、残る共通費、グループ内取引の消去などを反映した2025年ベースの試算。予想ではない）。会社の中期目標は調整後EBITAマージン13〜15%</div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        mount.innerHTML = html;
+
+        // データ表の生成（原典単位）
+        let tableRowsHtml = "";
+        DATA.raw_csvs.itv_deal_terms.forEach(r => {
+          tableRowsHtml += `<tr>
+            <td style="font-weight:700;">${r.term_item}</td>
+            <td class="num">${r.value_figure || "—"}</td>
+            <td>${r.unit}</td>
+            <td>${r.description_ja}</td>
+            <td>${r.source_id}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = tableRowsHtml;
+      }
+
+      function renderFig1_5() {
+        const logs = DATA.raw_csvs.itv_segment_definition_log;
+        const tbody = document.querySelector("#table-fig-1-5-full tbody");
+        let html = "";
+        logs.forEach(l => {
+          const rawQuote = l.quote || "";
+          const safeQuote = rawQuote.replace(/"/g, '&quot;');
+          html += `<tr>
+            <td class="num" style="font-weight:700; text-align:center;">${l.fiscal_year}</td>
+            <td>${l.old_segment_name}</td>
+            <td>${l.new_segment_name}</td>
+            <td>${l.what_moved}</td>
+            <td style="text-align:center;">${l['restated_comparatives_provided (Y/N)'] === 'Y' ? '○' : '×'}</td>
+            <td>${l.continuity_note || "—"}</td>
+            <td style="padding: 4px 8px;">
+              <div class="quote-scroll-box" title="${safeQuote}">${rawQuote}</div>
+            </td>
+          </tr>`;
+        });
+        tbody.innerHTML = html;
+      }
+
+      // --- [図2-1] フジHD ２本柱の利益推移 ---
+      function renderFig2_1() {
+        const d = DATA.charts.fig2_1;
+        const mount = document.getElementById("chart-fig-2-1");
+        const tbody = document.querySelector("#table-fig-2-1 tbody");
+
+        let tableRowsHtml = "";
+        d.periods.forEach((p, i) => {
+          // 原典単位（百万円）で表を出力
+          const mMil = d.media_contents[i].value_mil !== undefined ? d.media_contents[i].value_mil : Math.round(d.media_contents[i].value * 100);
+          const uMil = d.urban_tourism[i].value_mil !== undefined ? d.urban_tourism[i].value_mil : Math.round(d.urban_tourism[i].value * 100);
+          const totMil = mMil + uMil;
+          const uShare = totMil > 0 ? (uMil / totMil * 100).toFixed(1) + "%" : "—";
+          tableRowsHtml += `<tr>
+            <td class="num">${p}</td>
+            <td class="num">${mMil.toLocaleString()}</td>
+            <td class="num">${uMil.toLocaleString()}</td>
+            <td class="num">${totMil.toLocaleString()}</td>
+            <td class="num">${uShare}</td>
+            <td>${d.media_contents[i].basis}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = tableRowsHtml;
+
+        const w = 840, h = 370;
+        const pad = { top: 35, right: 35, bottom: 40, left: 60 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+        // データの最小値 -308.4億円、最大値 251.8億円 を完全に包含する範囲
+        const minY = -350, maxY = 300;
+
+        function getX(idx) { return pad.left + (idx / (d.periods.length - 1)) * plotW; }
+        function getY(val) { return pad.top + plotH - ((val - minY) / (maxY - minY)) * plotH; }
+
+        let svg = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="background:#111726; border-radius:6px; font-family:var(--f-mono);">`;
+
+        // Y軸グリッド線（50億円刻み）
+        for (let v = minY; v <= maxY; v += 50) {
+          if (v === 0) continue;
+          const yPos = getY(v);
+          svg += `<line x1="${pad.left}" y1="${yPos}" x2="${w - pad.right}" y2="${yPos}" stroke="#1d2433" stroke-width="1"/>
+            <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="9.5" text-anchor="end">${EN ? v / 10 : v}</text>`;
+        }
+
+        // 0基準線の強調（はっきり見える破線）
+        const zeroY = getY(0);
+        svg += `<line x1="${pad.left}" y1="${zeroY}" x2="${w - pad.right}" y2="${zeroY}" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,4"/>
+          <text x="${pad.left - 8}" y="${zeroY + 4}" fill="#f8fafc" font-size="10" text-anchor="end" font-weight="bold">0</text>`;
+
+        svg += `<text x="${pad.left - 8}" y="${pad.top - 12}" fill="#8a93a1" font-size="10" text-anchor="end">億円</text>`;
+
+        d.periods.forEach((p, idx) => {
+          const xPos = getX(idx);
+          svg += `<line x1="${xPos}" y1="${pad.top}" x2="${xPos}" y2="${h - pad.bottom}" stroke="#1d2433" stroke-width="1"/>
+            <text x="${xPos}" y="${h - pad.bottom + 18}" fill="#8a93a1" font-size="10.5" text-anchor="middle">${p}</text>`;
+        });
+
+        svg += `
+          <line x1="${getX(0)}" y1="${pad.top}" x2="${getX(0)}" y2="${h - pad.bottom}" stroke="#9cc2f0" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <text x="${getX(0) + 6}" y="${pad.top + 14}" fill="#9cc2f0" font-size="9.5">2018年 区分変更（2本柱化）</text>
+        `;
+
+        const lastIdx = d.periods.length - 1;
+        svg += `
+          <line x1="${getX(lastIdx)}" y1="${pad.top}" x2="${getX(lastIdx)}" y2="${h - pad.bottom}" stroke="#ffb35c" stroke-width="1.5" stroke-dasharray="3,3"/>
+          <text x="${getX(lastIdx) - 6}" y="${pad.top + 14}" fill="#ffb35c" font-size="9.5" text-anchor="end">2026年2月 外部資本導入の検討を公表</text>
+        `;
+
+        // 都市開発・観光 (補助色: #ffb35c)
+        const urbanPts = d.urban_tourism.map((u, idx) => `${getX(idx)},${getY(u.value)}`);
+        svg += `<polyline points="${urbanPts.join(" ")}" fill="none" stroke="#ffb35c" stroke-width="3"/>`;
+
+        // メディア・コンテンツ (フジ基本カラー: #FF0000)
+        const mediaPts = d.media_contents.map((m, idx) => `${getX(idx)},${getY(m.value)}`);
+        svg += `<polyline points="${mediaPts.join(" ")}" fill="none" stroke="#FF0000" stroke-width="3" filter="drop-shadow(0 0 3px rgba(255,0,0,0.4))"/>`;
+
+        d.urban_tourism.forEach((u, idx) => {
+          const isNeg = u.value < 0;
+          const p = d.periods[idx];
+          const uMil = u.value_mil !== undefined ? u.value_mil : Math.round(u.value * 100);
+          svg += `<circle class="chart-point" cx="${getX(idx)}" cy="${getY(u.value)}" r="4.5" fill="${isNeg ? '#111726' : '#ffb35c'}" stroke="#ffb35c" stroke-width="2"
+            data-tt-title="${p}（フジHD）"
+            data-tt-label="都市開発・観光事業 営業利益"
+            data-tt-val="${u.value.toFixed(1)}億円"
+            data-tt-color="#ffb35c"
+            data-tt-note="${isNeg ? '★赤字 ' : ''}原典: ${uMil.toLocaleString()}百万円"/>`;
+        });
+
+        d.media_contents.forEach((m, idx) => {
+          const isNeg = m.value < 0;
+          const mY = getY(m.value);
+          const p = d.periods[idx];
+          const mMil = m.value_mil !== undefined ? m.value_mil : Math.round(m.value * 100);
+          svg += `<circle class="chart-point" cx="${getX(idx)}" cy="${mY}" r="5" fill="${isNeg ? '#111726' : '#FF0000'}" stroke="#FF0000" stroke-width="2"
+            data-tt-title="${p}（フジHD）"
+            data-tt-label="メディア・コンテンツ事業 営業利益"
+            data-tt-val="${m.value.toFixed(1)}億円"
+            data-tt-color="#FF0000"
+            data-tt-note="${isNeg ? '★赤字（営業損失） ' : ''}原典: ${mMil.toLocaleString()}百万円 (${m.basis})"/>`;
+
+        });
+
+        // 赤字引き出し線と吹き出し（左側領域へ引き出して配置）
+        // ① 2025年3月期 (-40.9億円): idx=7
+        const m25X = getX(7);
+        const m25Y = getY(d.media_contents[7].value);
+        const box25W = 78, box25H = 20;
+        const box25X = m25X - 110; // 712 - 110 = 602 (赤い折れ線の左下空白領域)
+        const box25Y = m25Y + 14;  // 190 + 14 = 204
+
+        svg += `
+          <g class="chart-annotation">
+            <polyline points="${m25X - 5},${m25Y} ${box25X + box25W + 12},${box25Y + box25H / 2} ${box25X + box25W},${box25Y + box25H / 2}" fill="none" stroke="#FF0000" stroke-width="1.2"/>
+            <circle cx="${m25X - 5}" cy="${m25Y}" r="1.5" fill="#FF0000"/>
+            <rect x="${box25X}" y="${box25Y}" width="${box25W}" height="${box25H}" fill="#1e1b1b" rx="3" stroke="#FF0000" stroke-width="1" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"/>
+            <text x="${box25X + box25W / 2}" y="${box25Y + 13.5}" fill="#fca5a5" font-size="9.5" font-weight="bold" text-anchor="middle">-40.9億円</text>
+          </g>
+        `;
+
+        // ② 2026年3月期 (-308.4億円): idx=8
+        const m26X = getX(8);
+        const m26Y = getY(d.media_contents[8].value);
+        const box26W = 86, box26H = 20;
+        const box26X = m26X - 124; // 805 - 124 = 681 (急降下した赤い折れ線の左側空白領域)
+        const box26Y = m26Y - 26;  // 311 - 26 = 285
+
+        svg += `
+          <g class="chart-annotation">
+            <polyline points="${m26X - 5},${m26Y} ${box26X + box26W + 14},${box26Y + box26H / 2} ${box26X + box26W},${box26Y + box26H / 2}" fill="none" stroke="#FF0000" stroke-width="1.2"/>
+            <circle cx="${m26X - 5}" cy="${m26Y}" r="1.5" fill="#FF0000"/>
+            <rect x="${box26X}" y="${box26Y}" width="${box26W}" height="${box26H}" fill="#1e1b1b" rx="3" stroke="#FF0000" stroke-width="1" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.5))"/>
+            <text x="${box26X + box26W / 2}" y="${box26Y + 13.5}" fill="#fca5a5" font-size="9.5" font-weight="bold" text-anchor="middle">-308.4億円</text>
+          </g>
+        `;
+
+        svg += `
+          <g transform="translate(${pad.left + 20}, ${pad.top - 12})">
+            <line x1="0" y1="0" x2="20" y2="0" stroke="#FF0000" stroke-width="3"/>
+            <circle cx="10" cy="0" r="3.5" fill="#FF0000"/>
+            <text x="26" y="4" fill="#eef1f5" font-size="11">メディア・コンテンツ事業（フジ基本カラー：赤）</text>
+
+            <line x1="320" y1="0" x2="340" y2="0" stroke="#ffb35c" stroke-width="3"/>
+            <circle cx="330" cy="0" r="3.5" fill="#ffb35c"/>
+            <text x="346" y="4" fill="#eef1f5" font-size="11">都市開発・観光事業（※赤字時は白抜き）</text>
+          </g>
+        `;
+
+        svg += `</svg>`;
+        mount.innerHTML = svg;
+      }
+
+      window.exportFujiTwoPillars = () => downloadRawCsv("fig2_fuji_two_pillars");
+
+      // --- [図3-1] 放送利益比率（基本カラー規定適用） ---
+      window.toggleCompanyFilter = function(comp) {
+        currentCompanyFilter = comp;
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+          btn.classList.toggle("active", btn.getAttribute("data-company") === comp);
+        });
+        renderFig3_1();
+      };
+
+      function renderFig3_1() {
+        const seriesDict = DATA.charts.fig3_1;
+        const mount = document.getElementById("chart-fig-3-1");
+        const tbody = document.querySelector("#table-fig-3-1 tbody");
+
+        let tableRowsHtml = "";
+        DATA.raw_csvs.fig4_broadcast_profit_share.forEach(r => {
+          tableRowsHtml += `<tr>
+            <td>${r.company}</td>
+            <td>${r['series(structure)']}</td>
+            <td>${r.period}</td>
+            <td class="num">${parseFloat(r.broadcast_profit).toFixed(1)}</td>
+            <td class="num">${parseFloat(r.total_segment_profit).toFixed(1)}</td>
+            <td class="num">${parseFloat(r.broadcast_share_pct).toFixed(1)}%</td>
+            <td>${r.broadcast_segments}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = tableRowsHtml;
+
+        const w = 840, h = 360;
+        const pad = { top: 40, right: 30, bottom: 45, left: 55 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+        const minY = 0, maxY = 100;
+        const minYear = 2014, maxYear = 2026;
+
+        function getX(year) { return pad.left + ((year - minYear) / (maxYear - minYear)) * plotW; }
+        function getY(pct) { return pad.top + plotH - (pct / maxY) * plotH; }
+
+        let svg = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="background:#111726; border-radius:6px; font-family:var(--f-mono);">`;
+
+        for (let v = 0; v <= 100; v += 20) {
+          const yPos = getY(v);
+          svg += `<line x1="${pad.left}" y1="${yPos}" x2="${w - pad.right}" y2="${yPos}" stroke="#1d2433" stroke-width="1"/>
+            <text x="${pad.left - 8}" y="${yPos + 4}" fill="#8a93a1" font-size="10" text-anchor="end">${v}%</text>`;
+        }
+
+        for (let yr = minYear; yr <= maxYear; yr++) {
+          const xPos = getX(yr);
+          svg += `<line x1="${xPos}" y1="${pad.top}" x2="${xPos}" y2="${h - pad.bottom}" stroke="#1d2433" stroke-width="1"/>
+            <text x="${xPos}" y="${h - pad.bottom + 18}" fill="#8a93a1" font-size="11" text-anchor="middle">${yr}</text>`;
+        }
+        svg += `<text x="${w - pad.right}" y="${h - pad.bottom + 34}" fill="#64748b" font-size="10" text-anchor="end">※日本: 3月期 / ITV: 12月期</text>`;
+
+        // 基本カラー規定を完全適用
+        const styles = {
+          "フジ・メディアHD": { color: "#FF0000", label: "フジ (赤)" },
+          "TBS HD": { color: "#4b82f6", label: "TBS (青)" },
+          "テレビ朝日HD": { color: "#FF66FF", label: "テレ朝 (ピンク)" },
+          "テレビ東京HD": { color: "#00B0F0", label: "テレ東 (水色)" },
+          "ITV plc": { color: "#8a93a1", label: "ITV (参考)" }
+        };
+
+        Object.keys(seriesDict).forEach(key => {
+          const s = seriesDict[key];
+          const comp = s.company;
+          if (currentCompanyFilter !== "all" && currentCompanyFilter !== comp) return;
+
+          const st = styles[comp] || { color: "#fff", label: comp };
+          const isOld = s.series_type === "旧";
+          const isITV = comp.includes("ITV");
+          const dash = isITV ? "3,3" : (isOld ? "none" : "5,4");
+          const strokeW = isITV ? 1.5 : (isOld ? 2.8 : 2.2);
+
+          const pts = s.data.map(dItem => {
+            const yrMatch = dItem.period.match(/(\d{4})/);
+            const yr = yrMatch ? parseInt(yrMatch[1]) : 2020;
+            return { x: getX(yr), y: getY(dItem.broadcast_share_pct), year: yr, pct: dItem.broadcast_share_pct, raw: dItem };
+          });
+
+          const polylinePts = pts.map(p => `${p.x},${p.y}`).join(" ");
+          svg += `<polyline points="${polylinePts}" fill="none" stroke="${st.color}" stroke-width="${strokeW}" stroke-dasharray="${dash}"/>`;
+
+          pts.forEach(p => {
+            const unit = isITV ? "百万ポンド" : "百万円";
+            svg += `<circle class="chart-point" cx="${p.x}" cy="${p.y}" r="${isITV ? 3.5 : 4.5}" fill="${st.color}" stroke="#111726" stroke-width="1.5"
+              data-tt-title="${comp}（${p.raw.period}）"
+              data-tt-label="${comp} ${s.series_type}区分"
+              data-tt-val="${p.pct.toFixed(1)}%"
+              data-tt-color="${st.color}"
+              data-tt-note="放送利益: ${parseFloat(p.raw.broadcast_profit).toFixed(1)} / 全社利益: ${parseFloat(p.raw.total_segment_profit).toFixed(1)} (${unit})"/>`;
+          });
+
+          if (comp === "フジ・メディアHD" && isOld) {
+            const lastP = pts[pts.length - 1];
+            svg += `
+              <g transform="translate(${lastP.x}, ${lastP.y})">
+                <line x1="-5" y1="-5" x2="5" y2="5" stroke="#FF0000" stroke-width="2.5"/>
+                <line x1="-5" y1="5" x2="5" y2="-5" stroke="#FF0000" stroke-width="2.5"/>
+                <text x="10" y="4" fill="#FF0000" font-size="9.5" font-weight="bold">以後、放送単独の利益非開示</text>
+              </g>
+            `;
+          }
+          if (comp === "TBS HD" && isOld) {
+            const lastP = pts[pts.length - 1];
+            svg += `
+              <g transform="translate(${lastP.x}, ${lastP.y})">
+                <line x1="-5" y1="-5" x2="5" y2="5" stroke="#4b82f6" stroke-width="2.5"/>
+                <line x1="-5" y1="5" x2="5" y2="-5" stroke="#4b82f6" stroke-width="2.5"/>
+                <text x="10" y="4" fill="#4b82f6" font-size="9.5" font-weight="bold">以後、放送単独の利益非開示</text>
+              </g>
+            `;
+          }
+        });
+
+        svg += `
+          <g transform="translate(${pad.left}, ${pad.top - 20})">
+            <line x1="0" y1="0" x2="16" y2="0" stroke="#fff" stroke-width="2"/>
+            <text x="22" y="4" fill="#eef1f5" font-size="11">実線＝旧区分</text>
+            <line x1="${EN ? 190 : 110}" y1="0" x2="${EN ? 206 : 126}" y2="0" stroke="#fff" stroke-width="2" stroke-dasharray="4,3"/>
+            <text x="${EN ? 212 : 132}" y="4" fill="#eef1f5" font-size="11">破線＝新区分</text>
+            <circle cx="${EN ? 375 : 230}" cy="0" r="4" fill="#FFC000"/>
+            <text x="${EN ? 385 : 240}" y="4" fill="#FFC000" font-size="11">日テレ：放送単独の利益は一度も開示されていない（線なし）</text>
+          </g>
+        `;
+
+        svg += `</svg>`;
+        mount.innerHTML = svg;
+      }
+
+      window.exportProfitShare = () => downloadRawCsv("fig4_broadcast_profit_share");
+
+      // --- [図3-2] テレ東 2023年3月期 2つの線の引き方 ---
+      function formatStructure(str) {
+        if (!str) return "";
+        if (str.indexOf("旧区分") !== -1) return "旧区分（地上波放送事業＋BS放送事業）";
+        if (str.indexOf("新区分") !== -1) return "新区分（地上波・BS放送事業）";
+        return str;
+      }
+
+      function renderFig3_2() {
+        const d = DATA.charts.fig3_2;
+        const mount = document.getElementById("chart-fig-3-2");
+        const tbody = document.querySelector("#table-fig-3-2 tbody");
+
+        let tableRowsHtml = "";
+        d.forEach(r => {
+          tableRowsHtml += `<tr>
+            <td><strong>${formatStructure(r.structure)}</strong></td>
+            <td>${r.period}</td>
+            <td class="num">${r.broadcast_profit.toFixed(1)}</td>
+            <td class="num">${r.total_profit.toFixed(1)}</td>
+            <td class="num" style="font-weight:700; color:var(--color-tx);">${r.share_pct.toFixed(1)}%</td>
+            <td>${r.broadcast_segments}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = tableRowsHtml;
+
+        const w = 840, h = 180;
+        const pad = { top: 30, right: 100, bottom: 25, left: EN ? 420 : 275 };
+        const plotW = w - pad.left - pad.right;
+
+        let svg = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="background:#111726; border-radius:6px; font-family:var(--f-body);">`;
+
+        d.forEach((item, idx) => {
+          const y = pad.top + idx * 55;
+          const barH = 32;
+          const barW = (item.share_pct / 100) * plotW;
+          // テレ東カラー（水色 #00B0F0）と濃淡
+          const color = idx === 0 ? "#00B0F0" : "#ffb35c";
+
+          svg += `<rect class="chart-annotation" x="${pad.left}" y="${y}" width="${plotW}" height="${barH}" fill="#162035" rx="4"/>`;
+          svg += `<rect class="chart-bar" x="${pad.left}" y="${y}" width="${barW}" height="${barH}" fill="${color}" rx="4"
+            data-tt-title="テレビ東京HD 2023年3月期"
+            data-tt-label="${formatStructure(item.structure)}"
+            data-tt-val="${item.share_pct.toFixed(1)}%"
+            data-tt-color="${color}"
+            data-tt-note="放送利益: ${item.broadcast_profit.toFixed(1)}百万円 / セグメント合計: ${item.total_profit.toFixed(1)}百万円"/>`;
+
+          svg += `<text class="chart-annotation" x="${pad.left - 12}" y="${y + 20}" fill="#eef1f5" font-size="12" text-anchor="end">${formatStructure(item.structure)}</text>`;
+          svg += `<text class="chart-annotation" x="${pad.left + barW + 10}" y="${y + 21}" fill="${color}" font-size="14" font-weight="bold" font-family="var(--f-mono)">${item.share_pct}%</text>`;
+        });
+
+        svg += `</svg>`;
+        mount.innerHTML = svg;
+      }
+
+      window.exportTxCompare = () => downloadRawCsv("fig4_broadcast_profit_share");
+
+      // --- [図4-1] 売上に占める放送の比率 (スロープ図・基本カラー適用) ---
+      function renderFig4_1() {
+        const d = DATA.charts.fig5_1;
+        const mount = document.getElementById("chart-fig-4-1");
+        const tbody = document.querySelector("#table-fig-4-1 tbody");
+
+        let tableRowsHtml = "";
+        d.forEach(r => {
+          tableRowsHtml += `<tr>
+            <td>${r.company}</td>
+            <td>${r.period}</td>
+            <td class="num">${r.broadcast_rev.toFixed(1)}</td>
+            <td class="num">${r.content_ip_rev.toFixed(1)}</td>
+            <td class="num">${r.non_broadcast_rev.toFixed(1)}</td>
+            <td class="num" style="font-weight:700;">${r.broadcast_share_pct.toFixed(1)}%</td>
+            <td>${r.source}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = tableRowsHtml;
+
+        const pairs = {};
+        d.forEach(r => {
+          if (!pairs[r.company]) pairs[r.company] = {};
+          if (r.period.includes("2015")) pairs[r.company].start = r;
+          else pairs[r.company].end = r;
+        });
+
+        const w = 840, h = 360;
+        const pad = { top: 35, right: 180, bottom: 30, left: 180 };
+        const plotH = h - pad.top - pad.bottom;
+        const minY = 0, maxY = 80;
+
+        function getY(pct) { return pad.top + plotH - (pct / maxY) * plotH; }
+        const leftX = pad.left;
+        const rightX = w - pad.right;
+
+        let svg = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" style="background:#111726; border-radius:6px; font-family:var(--f-body);">`;
+
+        svg += `
+          <line x1="${leftX}" y1="${pad.top}" x2="${leftX}" y2="${h - pad.bottom}" stroke="#3b4861" stroke-width="1.5"/>
+          <line x1="${rightX}" y1="${pad.top}" x2="${rightX}" y2="${h - pad.bottom}" stroke="#3b4861" stroke-width="1.5"/>
+          <text x="${leftX}" y="${pad.top - 12}" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">2015年3月期</text>
+          <text x="${rightX}" y="${pad.top - 12}" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">2026年3月期（ITVは2025年12月期）</text>
+        `;
+
+        Object.keys(pairs).forEach(comp => {
+          const p = pairs[comp];
+          if (!p.start || !p.end) return;
+
+          // 基本カラー規定に準拠した配色
+          const color = BROADCASTER_COLORS[comp] || "#8a93a1";
+          const isFuji = comp.includes("フジ");
+          const strokeW = isFuji ? 3.5 : 2;
+
+          const y1 = getY(p.start.broadcast_share_pct);
+          const y2 = getY(p.end.broadcast_share_pct);
+
+          // ラベル微調整（近接衝突回避）
+          let offsetLeftY = 4;
+          if (comp.includes("テレビ朝日")) offsetLeftY = -10;
+          if (comp.includes("テレビ東京")) offsetLeftY = 2;
+          if (comp.includes("日本テレビ")) offsetLeftY = 14;
+          if (comp.includes("ITV")) offsetLeftY = -6;
+          if (comp.includes("TBS")) offsetLeftY = 9;
+
+          const compUnit = comp.includes("ITV") ? "百万ポンド" : "百万円";
+          const diffPt = (p.end.broadcast_share_pct - p.start.broadcast_share_pct).toFixed(1);
+          svg += `
+            <line x1="${leftX}" y1="${y1}" x2="${rightX}" y2="${y2}" stroke="${color}" stroke-width="${strokeW}" ${isFuji ? 'filter="drop-shadow(0 0 4px #FF0000)"' : ''}/>
+            <circle class="chart-point" cx="${leftX}" cy="${y1}" r="${isFuji ? 5.5 : 4}" fill="${color}" stroke="#111726" stroke-width="1.5"
+              data-tt-title="${comp}（${p.start.period}）"
+              data-tt-label="売上に占める放送の比率"
+              data-tt-val="${p.start.broadcast_share_pct.toFixed(1)}%"
+              data-tt-color="${color}"
+              data-tt-note="放送売上: ${p.start.broadcast_rev.toFixed(1)}${comp.includes("ITV") ? "" : ` / 全社売上: ${(p.start.broadcast_rev + p.start.content_ip_rev + p.start.non_broadcast_rev).toFixed(1)}`} (${compUnit})"/>
+            <circle class="chart-point" cx="${rightX}" cy="${y2}" r="${isFuji ? 5.5 : 4}" fill="${color}" stroke="#111726" stroke-width="1.5"
+              data-tt-title="${comp}（${p.end.period}）"
+              data-tt-label="売上に占める放送の比率"
+              data-tt-val="${p.end.broadcast_share_pct.toFixed(1)}%"
+              data-tt-color="${color}"
+              data-tt-note="10年変化幅: ${diffPt > 0 ? '+' : ''}${diffPt}pt / 放送売上: ${p.end.broadcast_rev.toFixed(1)} (${compUnit})"/>
+
+            <text class="chart-annotation" x="${leftX - 10}" y="${y1 + offsetLeftY}" fill="${color}" font-size="${isFuji ? 12 : 11}" font-weight="${isFuji ? 'bold' : 'normal'}" text-anchor="end">
+              ${comp.replace('・ホールディングス','HD')} ${p.start.broadcast_share_pct.toFixed(1)}%
+            </text>
+            <text class="chart-annotation" x="${rightX + 10}" y="${y2 + 4}" fill="${color}" font-size="${isFuji ? 12 : 11}" font-weight="${isFuji ? 'bold' : 'normal'}" text-anchor="start">
+              ${p.end.broadcast_share_pct.toFixed(1)}% ${comp.replace('・ホールディングス','HD')}
+            </text>
+          `;
+        });
+
+        svg += `</svg>`;
+        mount.innerHTML = svg;
+      }
+
+      window.exportRevShare = () => downloadRawCsv("fig6_broadcast_revenue_share");
+
+      // --- [図4-2] 利益と売上の比較テーブル ---
+      function renderFig4_2() {
+        const d = DATA.charts.fig5_2;
+        const tbody = document.querySelector("#table-fig-4-2 tbody");
+        let html = "";
+        d.forEach(r => {
+          const isFuji = r.company.includes("フジ");
+          html += `<tr ${isFuji ? 'style="background:rgba(255,0,0,0.06);"' : ''}>
+            <td style="font-weight:700;">${r.company}</td>
+            <td>${r.fiscal_period}</td>
+            <td class="num" style="font-weight:700;">${r.revenue_share_pct.toFixed(1)}%</td>
+            <td class="num" style="${r.profit_share_pct === null ? 'color:var(--muted);' : 'font-weight:700; color:var(--accent);'}">
+              ${r.profit_share_text}
+            </td>
+            <td>${r.note}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = html;
+      }
+
+    });
+  </script>
+  <script>
+    // v1.57: 言語切り替えボタンの設置と英語化（アプリの描画後に実行）
+    document.addEventListener("DOMContentLoaded", function() {
+      window.I18N_MOUNT_SWITCH(document.querySelector(".header-meta"));
+      window.I18N_RUN();
+    });
+  </script>
+</body>
+</html>
